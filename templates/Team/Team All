@@ -1,0 +1,434 @@
+<!-- Add Project Modal -->
+<div class="modal fade" id="addProjectModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add Project</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {{message}}
+        <button class="btn-close" data-bs-dismiss="alert">      
+        <!-- <span aria-hidden="true">&times;</span>  -->
+        </button>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form action="/addProject" class="was-validated" method="post">
+          {% csrf_token %}
+        <div class="mb-3 mt-3">
+          <label for="title" class="form-label">Title: </label>
+          <input type="text" class="form-control" id="title" placeholder="Enter title" name="title" required>
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="description" class="form-label">Description: </label>
+          <textarea class="form-control" rows="5" id="description" name="description"></textarea>
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="deadLine" class="form-label">Deadline: </label>
+          <input type="number" id="deadLine" name="deadLine" min="1" width="50px" required>          
+        </div>
+      <center><button type="submit" class="btn btn-primary btn-lg" style="width: 90%;">Add</button></center>
+      <br>
+    </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Chat Modal -->
+<div class="modal  fade" id="chatModal">
+  <div class="modal-dialog modal-xl ">
+    <div class="modal-content bg-dark">
+
+      <!-- Modal Header -->
+      <div class="modal-header navbar">
+        <h4 class="modal-title  text-light"><i class="fas fa-comments fa-fw me-3"></i>CHAT</h4>
+
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+        
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div id="chatSection" class="container d-flex flex-column ms-5 mb-5"> 
+
+      
+        </div>
+        <div id="latestMessages" class="container-fluid"></div>
+        
+        
+        <div style="border-radius: 10px; background-color: rgba(0, 0, 0, 0.7); position: fixed;left: 0%;bottom: 0;width: 100%;">
+          
+            <form id="msg_form" >
+            {% csrf_token %}
+          
+                <input type="hidden" name="tm" id="tm" value="{{new_Team}}">
+              
+              <div class="mb-3 mt-3 d-flex align-items-center justify-content-center">
+                <button type="button" onclick="goToLatestMsg()" class="btn btn-info mx-3"><i class="fas fa-level-down-alt"></i></button>
+                <input type="text" class="form-control m-0 me-3 w-75 p-2" id="msg" placeholder="Enter message" name="msg" required>
+                <input type="submit" class="btn btn-primary" value="send">
+              </div>
+
+            </form>
+        </div>
+      </div>
+    <script>
+      $(document).ready(function(){
+        setInterval(function(){
+          $.ajax({
+        type: "GET",
+        url: "getMessages/{{new_Team}}", 
+        success: function (response) {
+          $("#chatSection").empty();
+          for(var index in response.Msg){
+                var imgUrl = 'url("../';
+                imgUrl += response.Msg[index].photo;
+                imgUrl += '")';
+
+                var now = new Date();
+                let date = response.Msg[index].date
+                let dateInfo = date.slice(0, 10);
+                let year = date.slice(0, 4);
+                let mounth = date.slice(5, 7);
+                let day = date.slice(8, 10);
+                let timeInfo = date.slice(11, 19);
+                let hours = date.slice(11, 13);
+                let min = date.slice(14, 16);
+                let sec = date.slice(17, 19);
+                mounth = parseInt(mounth);
+                mounth -= 1;
+                var msgDate = new Date(year,mounth,day,hours,min,sec,0);
+                var difference = now.getTime() - msgDate.getTime();
+                console.log(difference);
+
+
+                if (difference < 259200000){
+                if (response.Msg[index].userName == '{{myProfile.owner.username}}'){
+                 var temp =  "<div class='card  bg-light shadow my-3 border p-3 w-50' ><div class='d-flex justify-content-between'><div class='d-flex align-items-center'><div class='rounded-circle border me-3 shadow-lg' style='width: 40px;height: 40px;background:"+ imgUrl +";background-position: center;background-size: cover;'></div><p class='text-primary p-0 m-0 me-3'>"+response.Msg[index].userName+":</p><p class='ms-2 m-0' style='opacity: 0.6;'>"+ dateInfo +" | "+timeInfo +"</p></div></div><hr width='100%'><p class='m-0'>"+response.Msg[index].title+"</p></div>";  
+                }
+                else{
+                 var temp =  "<div class='card  bg-light shadow my-3 border p-3 w-50' style = 'position: realtive; left:40%'><div class='d-flex justify-content-between'><div class='d-flex align-items-center'><div class='rounded-circle border me-3 shadow-lg' style='width: 40px;height: 40px;background:"+ imgUrl +";background-position: center;background-size: cover;'></div><p class='text-primary p-0 m-0 me-3'>"+response.Msg[index].userName+":</p><p class='ms-2 m-0' style='opacity: 0.6;'>"+ dateInfo +" | "+timeInfo +"</p></div></div><hr width='100%'><p class='m-0'>"+response.Msg[index].title+"</p></div>";  
+                } 
+                $("#chatSection").append(temp);
+
+              }
+          }
+          
+        }
+      });
+        },2000);
+      })
+     
+    </script>
+        <script type="text/javascript">
+          $(document).on('submit','#msg_form',function(e){
+            e.preventDefault();
+            $.ajax({
+              type: "POST",
+              url: "/addMessage",
+              data: {
+                tm: $('#tm').val(),
+                msg:$('#msg').val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+              },
+              success: function (response) {
+                //window.location.hash = "jump_to_this_location";
+                document.getElementById("latestMessages").scrollIntoView({behavior: 'smooth'});
+                const msg = document.getElementById('msg');
+                msg.value = '';
+
+              }
+            });
+          });
+
+          function goToLatestMsg(){
+            document.getElementById("latestMessages").scrollIntoView({behavior: 'smooth'});
+          }
+          
+        </script>
+
+          </div>
+
+    </div>
+  </div>
+</div>
+
+
+    <div class="container">
+
+      <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+        <div class="position-sticky">
+          <div class="list-group nav nav-pills list-group-flush mx-3 mt-4">
+
+            <a href="#teamInfo" data-bs-toggle="pill" class="list-group-item list-group-item-action py-2 ripple active" aria-current="true">
+              <i class="	fas fa-info fa-fw me-3"></i><span>Team Info</span>
+            </a>
+
+            </a>
+            <a href="#projects" data-bs-toggle="pill" class="list-group-item list-group-item-action py-2 ripple " aria-current="true">
+              <i class="fas fa-chart-bar fa-fw me-3"></i><span>Projects</span>
+            </a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#chatModal" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+              <i class="fas fa-comments fa-fw me-3"></i>Chat</a>
+            
+            <a href="#members" data-bs-toggle="pill" class="list-group-item list-group-item-action py-2 ripple " aria-current="true">
+              <i class="fas fa-users fa-fw me-3"></i><span>Members</span>
+            </a>             
+          </div>
+        </div>
+        <a href="\"  class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+          <i class="fas fa-chevron-left fa-fw me-3"></i><span>Homepage</span>
+        </a>
+      </nav>
+
+
+      
+
+
+        <div class="tab-content">
+            <div id="teamInfo" class="animated fade-in-left container tab-pane active"><br>
+              <center><div class="container mt-3 p-5 card border border-5 border-top-0 border-bottom-0  bg-light text-black">
+                {% for message in messages %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Alert: </strong> {{message}}
+                <button class="btn-close" data-bs-dismiss="alert">      
+                <span aria-hidden="true">&times;</span> 
+                </button>
+                </div>
+                {% endfor %}
+                
+                      
+                <h1 class="text-primary p-0 m-0">Welcome to {{ new_Team.title }} </h1>
+                <hr width="100%">
+                      
+                 
+                    <h3>Leader: {{ new_Team.leader.owner.username }}</h3>
+                    <br>
+                    <p> {{ new_Team.description }} </p>
+                    <br><br>
+                    {% if myProfile == new_Team.leader %}
+                    <center><button type="button" onclick="teamDelete()" class="btn btn-danger">Delete The Team</button></center>
+                    {% else %}
+                    <center><button type="button" onclick="teamLeave()" class="btn btn-danger">Leave The Team</button></center>
+                    {% endif %}
+
+                   <script>
+                    function teamDelete(){
+                      if (confirm("Are you sure?") == true) {
+                       window.location.href = "/teamRemove/"+"{{new_Team}}";
+                      }   
+                    }
+                    function teamLeave(){
+                      if (confirm("Are you sure?") == true) {
+                       window.location.href = "/leaveTeam/"+"{{new_Team}}"+"/{{myProfile}}";
+                      }   
+                    }
+                      </script>
+
+                  </div></center>
+          
+            </div>
+            <div id="projects" class="container tab-pane fade"><br>
+            
+              <div class="top" style="display: flex;align-items: center;justify-content: space-between;">
+                <div class="left">
+                  <h3><img src="{% static 'img\Projects.png' %}" alt="" style="width: 50px;margin-right: 10px;">Projects</h3>
+                </div>
+                
+                <div class="right d-flex align-items-center">
+
+
+                  <a type="button" class="dropdown-toggle btn btn-primary m-2" href="#" role="button" data-bs-toggle="dropdown" onclick="
+                  document.getElementById('first2').className = 'dropdown-item nav-link';
+                  document.getElementById('sec2').className = 'dropdown-item nav-link'
+                  "><i class="fas fa-stream fa-fw me-3"></i><span>Show</span>
+                  </a>
+                    <ul class="dropdown-menu">
+                     <ul class=" nav nav-pill" role="tablist">
+                        <li><a id="first2" class="dropdown-item nav-link" data-bs-toggle="pill" href="#projects">In-Progress Projects</a></li>
+                        <li><a id="sec2" class="dropdown-item nav-link" data-bs-toggle="pill" href="#doneProjects">Completed Projects</a></li>
+                     </ul>
+                    </ul>
+    
+                  
+                    
+                      {% if myProfile == new_Team.leader %}
+                        <button type="button" class="btn btn-primary btn m-2" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+                          <i class="fas fa-plus fa-fw me-3"></i><span>Add Project</span>
+                        </button>
+                      {% endif %}
+                    
+
+                  </div>
+              </div>
+
+
+              <hr style="width: 80;">
+
+
+            <div class="row mb-3">
+            {% for project in all_Projects %}
+            
+            {% if project.team == new_Team and project.is_Done == False %}
+
+                
+              
+            <div class="shadow p-5 card  my-4 col-sm-12 col-xs-12 bg-light text-dark border border-5 border-top-0 border-bottom-0" style="max-width: 95%;margin-left: 10px;">
+              <div class="card-header">
+                <div>  
+                  <h2 class="card-title">{{project.title}}</h2>
+                 </div>
+                <br>
+                {% if  project.is_Done == False %}
+                <div class="progress" style="height:15px;border-radius: 5px;">
+                  <div class="progress-bar" id="projectProgress{{project.id}}" style="width: {% if project.progress == '0.0%' or project.progress == '0%' %}5%{% else %}{{ project.progress }}{% endif %};">{{project.progress}}</div>
+                </div>
+                {% endif %}
+
+              </div>
+
+              
+              <div class="card-body">
+                <p class="card-text">{{project.description}}</p>
+              </div>
+
+              <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                 <p class="card-text"><small class="text-muted">Deadline {{project.deadLine}} Days</small></p>
+                 <p class="card-text"><small class="text-muted">Daysleft {{project.dyas_Left}} Days</small></p>                  
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                 <a class="btn btn-info btn-lg " href="/toViewProject/{{project.id}}"><i class="fas fa-info-circle me-3"></i>Details</a>
+                  
+                  
+           
+                  
+                  
+                  {% if myProfile == new_Team.leader %}
+                  <button type="button" onclick="projectDelete()" class="btn btn-danger btn-lg">Cancel</button>
+                  {% endif %}
+                  
+                  <script>
+                    function projectDelete() {
+                      if (confirm("Are you sure?") == true) {
+                       window.location.href = "/projectDelete/"+"{{project.id}}";
+                      }
+                    }
+
+                  </script>
+                </div>
+  
+              </div>
+              
+            </div>
+   
+              {% endif %}
+              
+              {% endfor %}
+           </div>
+            
+            </div>
+
+
+            <div id="members" class="container tab-pane fade"><br>
+              <div class="d-flex justify-content-between align-items-center">
+                
+                <h3><img src="{% static 'img\Members.png' %}" alt="" style="width: 50px;margin-right: 10px;">Team members</h3>
+                <div class="d-flex">
+                  
+                  {% if myProfile == new_Team.leader %}
+                  <a class="btn btn-primary m-2" href="/toAddMembers">Add members</a>
+                  {% endif %}
+                  
+                </div>
+                
+
+              </div>
+              <hr style="width: 80;">
+      
+       
+              <div class="row">
+                
+                {% for member in new_Team.members.all %}
+
+                <!-- Member Modal -->
+                <div class="modal fade" id="memberInfoModal{{member.id}}">
+                  <div class="modal-dialog modal-dialog-centered model-xl">
+                    <div class="modal-content">
+
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h4 class="modal-title">{{member.owner.first_name}} {{member.owner.last_name}}</h4>
+                        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+                      </div>
+                      <!-- Modal body -->
+                      <div class="modal-body">
+                        <center> <div class="rounded-circle border shadow-lg" style="width: 300px;height: 290px;background: url('../{{member.photo}}');background-position: center;background-size: cover;"></div>
+                          <hr style="width: 80%;">
+                          <h4>Role: {{member.role}}</h4>
+                          <hr style="width: 80%;">
+                          <h4>Rate: <bl>{{member.rated}}%</bl></h4>
+                          <h4>Tasks done: <bl>{{member.doneTasksNum}}</bl></h4>
+
+                          </center>
+                      </div>
+                      <!-- Modal footer -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card border border-3 border-top-0 border-bottom-0 col-sm-5 ms-2 my-2" style="width:250px">
+
+                  <div class="card-body d-flex align-items-center" style="flex-direction: column;">
+                    <center><div class="rounded-circle border shadow mt-3" style="width: 150px;height: 140px;background: url('../{{member.photo}}');background-position: center;background-size: cover;"></div></center>
+                    <hr width="100%">
+                    {% if member == new_Team.leader %}
+                    <p style="color: rgb(255, 0, 0);" class=" m-0 p-0"><i><< LEADER >></i></p>
+                    {% endif %}
+                    <h4 class="card-title">{{member.owner.username}}</h4>
+
+                    <p class="card-text"><strong>Role: </strong> {{member.role}}</p>
+                    <button type="button" class="btn btn-primary btn m-2" data-bs-toggle="modal" data-bs-target="#memberInfoModal{{member.id}}">
+                      <i class="fas fa-info-circle fa-fw me-3"></i><span>See Info</span>
+                    </button>
+                    <br>
+                    {% if myProfile == new_Team.leader and member != new_Team.leader %}
+                    <button type="button" onclick="memberDelete('{{member.title}}')" class="btn btn-danger">kick out</button>
+                    {% endif %}
+                    <script>
+                      function memberDelete(title){
+                        if (confirm("Are you sure?") == true) {
+                         window.location.href = "/memberRemove/"+"{{new_Team}}/"+title;
+                        }   
+                      }
+                    </script>
+                  </div>
+                </div>
+
+                
+                {% endfor %}  
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+
+

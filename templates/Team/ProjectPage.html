@@ -1,0 +1,77 @@
+{% extends "Team/TeamPage.html" %}
+
+{% block ProjectHeader %}
+
+
+
+<li class="nav-item nav-category">
+  <span class="nav-link">Project / {{ project.title }}</span>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/toViewProject/{{ project.id }}">
+    <span class="menu-icon">
+      <i class="mdi mdi-book-open"></i>
+    </span>
+    <span class="menu-title">Project Info</span>
+  </a>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" data-toggle="collapse" href="#ui-basic-team-2" aria-expanded="false" aria-controls="ui-basic-team-2">
+    <span class="menu-icon">
+      <i class="mdi mdi-bulletin-board"></i>
+    </span>
+    <span class="menu-title">All Tasks</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="ui-basic-team-2">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item"> <a class="nav-link" href="/toViewMyTasks/{{project.id}}">In process</a></li>
+      <li class="nav-item"> <a class="nav-link" href="/toViewMyDoneTasks/{{project.id}}">Completed</a></li>
+  </ul>
+  </div>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" data-toggle="collapse" href="#ui-basic-team-3" aria-expanded="false" aria-controls="ui-basic-team-3">
+    <span class="menu-icon">
+      <i class="mdi mdi-bulletin-board"></i>
+    </span>
+    <span class="menu-title">My Tasks</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="ui-basic-team-3">
+    <ul class="nav flex-column sub-menu">
+        <li class="nav-item"> <a class="nav-link" href="/toViewTasks/{{project.id}}">In process</a></li>
+        <li class="nav-item"> <a class="nav-link" href="/toViewDoneTasks/{{project.id}}">Completed</a></li>
+    </ul>
+  </div>
+</li>
+
+{% if myProfile == team.leader %}
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/toViewTeam/{{ team.id }}">
+    <span class="menu-icon">
+      <i class="mdi mdi-account-multiple-outline"></i>
+    </span>
+    <span class="menu-title">Create Task</span>
+  </a>
+</li>
+{% endif %}
+
+{% endblock ProjectHeader %}
+
+{% block Content %}
+
+  {% block TeamContent %}
+  {% endblock TeamContent %}
+
+{% endblock Content %} 
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+{% extends "Header.html" %}
+
+{% block HeadContent %}
+{% load static %}
+<div class="container border p-5 card bg-light text-black" style="width: 70%;">
+    
+<center>
+        <img src="{% static 'img\Logo.png' %}" alt="" style="width: 250px">
+        <h1 style="color:green">Account successfully Activated</h1>
+        
+        <p style="color : #555555;">Login now to discover our features</p>
+        <br>
+        <a class="nav-link btn btn-primary btn w-50"  href="/login" style="color: white;">
+            <i class="fas fa-user fa-fw me-3"></i><span>Login</span>
+        </a>
+    </center>
+
+</div>
+
+{% endblock %}

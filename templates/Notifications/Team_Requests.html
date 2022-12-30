@@ -1,0 +1,54 @@
+{% extends "Header.html" %}
+
+{% block Content %}
+
+
+    <h2 class=" mb-4"><i class="mdi mdi-calendar fa-fw"></i> Team Requests</h2>
+
+    {% if team_req %}
+
+        <div class="row">
+
+            {% for noty in team_req %}
+            {% if noty.userToJoin == myProfile and noty.isUser == False %}
+
+                <div class="col-md-4 grid-margin stretch-card border p-3 m-0">
+                    <div class="preview-item">
+                            <h6 class="preview-subject">Team request from <y class="text-success">{{noty.teamToJoin.title}}</y> <p class="text-muted">{{noty.created_Date}}</p></h6>
+                            <div>
+                                <a href="/JoinTeam/{{noty.id}}" class="me-3">
+                                    <i class="mdi mdi-checkbox-marked-circle-outline" style="font-size: 25px;"></i>
+                                </a>
+                                <a href="/RequestReject/{{noty.id}}"><i class="mdi mdi-close-circle-outline" style="font-size: 25px;"></i></a>                                    
+                            </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="col-md-4 grid-margin stretch-card border p-3 m-0">
+                    <div class="preview-item m-0 p-0">
+                            <h6 class="preview-subject">User request from <y class="text-success">{{noty.userToJoin.title}}</y> to join <y class="text-success">{{noty.teamToJoin.title}}</y> <p class="text-muted">{{noty.created_Date}}</p></h6>
+                            <div>
+                                <a href="/JoinTeam/{{noty.id}}" class="me-3">
+                                    <i class="mdi mdi-checkbox-marked-circle-outline" style="font-size: 25px;"></i>
+                                </a>
+                                <a href="/RequestReject/{{noty.id}}"><i class="mdi mdi-close-circle-outline" style="font-size: 25px;"></i></a>                                    
+                            </div>
+                    </div>
+                </div>
+
+            {%endif%}
+            {% endfor %}
+               
+    </div>
+    {% else %}
+
+    <center><h3 class="text-muted m-3 p-3" style="height: 450px;">No requests</h3></center>
+
+
+    {%endif%}
+        
+    
+
+
+{% endblock %}

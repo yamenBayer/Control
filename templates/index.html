@@ -1,0 +1,103 @@
+{% extends "HomePage.html" %}
+
+{% block HomeContent %}
+{% load static %}
+<style>
+  .carousel-caption{
+    background-color: rgba(0, 86, 92, 0.8); 
+    border-radius: 10px;
+  }
+  img{
+    border-radius:10px
+  }
+  h5{
+    color: greenyellow;
+  }
+</style>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="home" class="container tab-pane active">
+              <marquee  width="100%" behavior="scroll" direction="right" height="20px" 
+                style="margin-top:10px;
+                animation-name: changeColor; 
+                animation-duration: 2s; 
+                animation-iteration-count: infinite;">
+                  Now With Control everything is under control 
+                  </marquee>
+            <div class="container" style="width: 85%;border-radius:10px">
+            
+            
+            <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
+              <!-- Indicators -->
+              <div class="carousel-indicators">
+                <button
+                  type="button"
+                  data-mdb-target="#carouselBasicExample"
+                  data-mdb-slide-to="0"
+                  class="active"
+                  aria-current="true"
+                  aria-label="Slide 1"
+                ></button>
+                <button
+                  type="button"
+                  data-mdb-target="#carouselBasicExample"
+                  data-mdb-slide-to="1"
+                  aria-label="Slide 2"
+                ></button>
+                <button
+                  type="button"
+                  data-mdb-target="#carouselBasicExample"
+                  data-mdb-slide-to="2"
+                  aria-label="Slide 3"
+                ></button>
+              </div>
+            
+              <!-- Inner -->
+              <div class="carousel-inner">
+                <!-- Single item -->
+                <div class="carousel-item active">
+                  <center><img src="{% static 'img/Main/Planing.jpg' %}" class="d-block bg-cover w-75" alt="Sunset Over the City"/></center>
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5>Project management</h5>
+                    <p>Effective planning leads to a successful project.</p>
+                  </div>
+                </div>
+            
+                <!-- Single item -->
+                <div class="carousel-item">
+                  <center><img src="{% static 'img/Main/Communicate.jpg' %}" class="d-block w-75" alt="Canyon at Nigh"/></center>
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5>Team management</h5>
+                    <p>Communicate with your team members and finish the tasks to get the best results.</p>
+                  </div>
+                </div>
+            
+                <!-- Single item -->
+                <div class="carousel-item">
+                  <center><img src="{% static 'img/Main/Rate.jpg' %}" class="d-block w-75" alt="Cliff Above a Stormy Sea"/></center>
+                  <div class="carousel-caption d-none d-md-block">
+                    <h5>Overall Rate</h5>
+                    <p>Work hard to get best rate against other teams.</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Inner -->
+            
+              <!-- Controls -->
+              <button class="carousel-control-prev text-dark" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next text-dark" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+            </div>
+            <!-- Carousel wrapper -->
+            </div>
+          
+
+          </div>
+        </div>
+        {% endblock %}

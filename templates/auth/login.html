@@ -1,0 +1,38 @@
+{% extends "auth/Auth_Layout.html" %}
+
+{% block AuthContent %}
+
+{% for message in messages %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+{{message}}
+<button class="btn-close" data-bs-dismiss="alert">      
+<!-- <span aria-hidden="true">&times;</span>  -->
+</button>
+</div>
+{% endfor %}
+
+<h3 class="card-title text-left mb-3"><i class="fas fa-user" style="margin-right:10px"></i> Login</h3>
+<hr>
+
+<form action="/login" class="was-validated" method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="uname">Username or email</label>
+    <input type="text" class="form-control p_input" id="uname" placeholder="Enter username/email" name="uname" required>
+  </div>
+  <div class="form-group">
+    <label for="pwd1">Password</label>
+    <input type="password" class="form-control p_input" id="pwd" placeholder="Enter password" name="pswd1" required>
+  </div>
+
+  <div class="text-center">
+    <button type="submit" class="btn btn-primary btn-block enter-btn">Login</button>
+  </div>
+  <p class="sign-up">Don't have an Account?<a href="/signup"> Sign Up</a></p>
+  <p class="sign-up text-center m-2">Forget your password?<a href="/password_reset"> Forgot password</a></p>
+  <p class="sign-up text-center  mt-3"><a href="/">Back Home</a></p>
+</form>
+       
+
+
+{% endblock  %}
