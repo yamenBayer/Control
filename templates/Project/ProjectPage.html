@@ -1,0 +1,102 @@
+{% extends "Team/TeamPage.html" %}
+
+{% block ProjectHeader %}
+
+  
+<li class="nav-item nav-category">
+  <span class="nav-link">Project : {{ project.title }}</span>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/toViewProject/{{ project.id }}">
+    <span class="menu-icon">
+      <i class="mdi mdi-book-open"></i>
+    </span>
+    <span class="menu-title">Project Info</span>
+  </a>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" data-toggle="collapse" href="#ui-basic-team-2" aria-expanded="false" aria-controls="ui-basic-team-2">
+    <span class="menu-icon">
+      <i class="mdi mdi-bulletin-board" style="color: #0090E7;"></i>
+    </span>
+    <span class="menu-title">All Tasks</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="ui-basic-team-2">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item"> <a class="nav-link" href="/toViewTasks/{{project.id}}"><i class="fas fas fa-spinner text-warning me-1"></i>In process</a></li>
+      <li class="nav-item"> <a class="nav-link" href="/toViewDoneTasks/{{project.id}}"><i class="fas far fa-check-circle text-success me-1"></i>Completed</a></li>
+  </ul>
+  </div>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" data-toggle="collapse" href="#ui-basic-team-3" aria-expanded="false" aria-controls="ui-basic-team-3">
+    <span class="menu-icon">
+      <i class="mdi mdi-notification-clear-all"></i>
+    </span>
+    <span class="menu-title">My Tasks</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="ui-basic-team-3">
+    <ul class="nav flex-column sub-menu">
+        <li class="nav-item"> <a class="nav-link" href="/toViewMyTasks/{{project.id}}"><i class="fas fas fa-spinner text-warning me-1"></i>In process</a></li>
+        <li class="nav-item"> <a class="nav-link" href="/toViewMyDoneTasks/{{project.id}}"><i class="fas far fa-check-circle text-success me-1"></i>Completed</a></li>
+    </ul>
+  </div>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/toViewPendingTasks/{{project.id}}">
+    <span class="menu-icon">
+      <i class="fas fa-calendar-times text-warning" ></i>
+    </span>
+    <span class="menu-title">Pending Tasks</span>
+  </a>
+</li>
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/toViewOutdatedTasks/{{project.id}}">
+    <span class="menu-icon">
+      <i class="fas fa-calendar-times text-danger"></i>
+    </span>
+    <span class="menu-title">Outdated Tasks</span>
+  </a>
+</li>
+{% if myProfile == team.leader or myProfile in team.admins.all or myProfile == project.ProjectLeader %}
+<li class="nav-item menu-items">
+  <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+    <span class="menu-icon">
+      <i class="mdi mdi-plus-box" style="color: #0E8DE2;"></i>
+    </span>
+    <span class="menu-title">Add task</span>
+  </a>
+</li>
+{% endif %}
+<li class="nav-item menu-items mb-5">
+  <a class="nav-link" href="/members/{{team.id}}/{{project.id}}">
+    <span class="menu-icon">
+      <i class="mdi mdi-account-multiple-outline" style="color: #00D25B;"></i>
+    </span>
+    <span class="menu-title">Project Members</span>
+  </a>
+</li>
+
+
+
+{% endblock ProjectHeader %}
+
+{% block Content %}
+
+  {% block TeamContent %}
+  {% endblock TeamContent %}
+
+{% endblock Content %} 
+
+
+
+
+
+
+

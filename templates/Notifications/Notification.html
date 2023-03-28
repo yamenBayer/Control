@@ -1,0 +1,40 @@
+{% extends "Header.html" %}
+
+{% block Content %}
+
+
+
+
+    <h2 class=" mb-5"><i class="mdi mdi-bullhorn"></i> Notifications</h2>
+
+    <div class="row">
+
+    
+    {% if notifications %}
+        {% for noty in notifications %}
+            
+        <div class="col-md-12 stretch-card preview-item-content d-sm-flex flex-grow border-bottom p-2 m-0">
+            <div class="flex-grow m-0 pt-1">
+              <p class="m-0 p-0">{{noty.title}}                          
+                {% if noty.isSeen == True %}
+                <y class="text-muted m-0 p-0">(Seen)</y>
+                {% else %}
+                <y class="m-0 p-0 text-success">(New)</y>
+                {% endif %}
+              </p>
+            </div>
+        </div>
+
+
+
+
+        {% endfor %}
+    {% else %}
+
+    <center><h3 class="text-muted m-3 p-3" style="height: 450px;">No notifications</h3></center>
+    {%endif%}
+        
+
+</div>
+
+{% endblock %}

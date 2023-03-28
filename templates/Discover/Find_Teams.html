@@ -1,0 +1,134 @@
+{% extends "Header.html" %}
+
+{% block Content %}
+
+
+
+
+
+<div class="row mb-3 border-bottom">
+    <div class="col-md-12 grid-margin stretch-card flex-grow d-flex align-items-stretch">
+        <h2><i class="mdi mdi-google-circles-extended"></i> Teams</h2>
+
+    </div>
+
+</div>
+
+{% for team in teams %}
+
+
+<div class="row">
+    <div class="col-md-4 grid-margin stretch-card">
+
+            <div class="card">
+
+            <div class="card-body p-0 m-0">
+                <center>
+                    <div style="width: 100%;height: 290px;background: url('../{{team.photo}}');background-position: center;background-size: cover;"></div>
+                </center>
+            </div>
+
+            </div>
+     
+    </div>
+    <div class="col-md-8 grid-margin stretch-card">
+
+        <div class="card">
+
+          <div class="card-body p-2 m-2 d-flex flex-column justify-content-between">
+
+            <div>
+                <h5 class="text mb-1">{{ team.title }}</h5>
+                <p class="text-muted mb-1">{{ team.short }}</p>
+                <br>
+                <h5><i class="mdi mdi-calendar-text"></i> Description</h5>   
+                <p class="text-muted">{{ team.description }}</p>             
+            </div>
+
+            <div>
+                {% if request.user.is_authenticated %}
+                    {% if team in requestedTeams %}
+                        <p class="text-muted float-end">Request sent</p>
+                    {% else %}
+
+                        {% if myProfile == team.leader %}
+                            <p class="text-success float-end">Owner</p>
+                        {% elif myProfile in team.members.all %}
+                            <p class="text-muted float-end">Member</p>
+                        {% else %}
+                            <a type="button" href="/reqJoinTeam/{{team.id}}" class="float-end btn btn-outline-primary">Send Join Request</a>
+                            
+                        {% endif %}     
+                    {% endif %}      
+                {% endif %}     
+            </div>
+
+            
+          </div>
+
+        </div>
+     
+    </div>
+ </div>
+<hr>
+{% endfor %}
+
+<script>
+    window.addEventListener('load', function () {
+      'use strict';
+        var substringMatcher = function(strs) {
+          return function findMatches(q, cb) {
+            var matches, substringRegex;
+      
+            // an array that will be populated with substring matches
+            matches = [];
+      
+            // regex used to determine if a string contains the substring `q`
+            var substrRegex = new RegExp(q, 'i');
+      
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            for (var i = 0; i < strs.length; i++) {
+              if (substrRegex.test(strs[i])) {
+                matches.push(strs[i]);
+              }
+            }
+      
+            cb(matches);
+          };
+        };
+      
+        var namesData = JSON.parse("{{namesData|escapejs}}");
+      
+        var names = [];
+        names = namesData.ListNames;
+      
+        $('#the-basics .typeahead').typeahead({
+          hint: true,
+          highlight: true,
+          minLength: 1
+        }, {
+          name: 'names',
+          source: substringMatcher(names)
+        });
+        // constructs the suggestion engine
+        var names = new Bloodhound({
+          datumTokenizer: Bloodhound.tokenizers.whitespace,
+          queryTokenizer: Bloodhound.tokenizers.whitespace,
+          // `names` is an array of state names defined in "The Basics"
+          local: names
+        });
+      
+        $('#bloodhound .typeahead').typeahead({
+          hint: true,
+          highlight: true,
+          minLength: 1
+        }, {
+          name: 'names',
+          source: names
+        });
+    })
+      
+      </script>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "Project/ProjectPage.html" %}
+
+{% block TeamContent %}
+
+<div class="row border-bottom pb-2">
+  <div class="col-md-10 col-xl-10">
+    <p class="text-muted"><a href="/toViewTeam/{{team.id}}">{{ team.title }}</a> / <a href="/toViewProject/{{project.id}}">{{ project.title }}</a> / {{location}}</p>
+  </div>
+
+</div>
+
+
+
+{% if tasks %}   
+{% for task in tasks %}
+<div style="border-radius: 10px;text-decoration: none;background: #191C24;" class="w-100 p-3 my-2">
+  <div class="row">
+    <div class="d-flex col-md-4 col-xl-4">
+
+        <i class="fas fa-times-circle text-warning me-2" style="font-size: 25px;"></i>
+        <h6 class="text-primary text-warning">{{ task.title }}<br><p class="text-muted mb-1 mt-1" style="font-size: 12px;">Task Number:{{task.id}}</p></h6>
+
+    </div>
+    <div class="col-md-6 col-xl-6">
+        <small class="text-muted"> Posted At: {{ task.created_Date }}</small>
+        <small class="text-warning"><span class="me-2">|</span>Pending</small>
+      </div>
+    <div class="col-md-2 col-xl-2">
+        <small class="text-muted">To: {{ task.forUser.owner.username }}</small> 
+    </div>
+  </div>
+<div class="m-0 p-0 pt-2 border-top" style="display: flex;align-items: center;justify-content: flex-end;">
+ 
+  {% if task.project.projectLeader == myProfile or task.project.team.leader == myProfile %}
+
+    <button class="btn btn-success " onclick="taskApprove({{task.id}})">Approve</button>
+    <button class="btn btn-danger ms-2" onclick="taskDelete({{task.id}})">Remove</button>
+
+  {% endif %}  
+  {% if  task.forUser == myProfile or task.project.projectLeader == myProfile or task.project.team.leader == myProfile %}
+  
+  <button class="btn btn-primary ms-2" onclick="taskRecover({{task.id}})">Recover</button>
+
+  {% endif %}     
+</div>
+</div>
+
+  <script>
+    function taskRecover(id) {
+        if (confirm("Are you sure?") == true) {
+          window.location.href = "/recoverTask/"+id;
+        }
+      }
+    function taskApprove(id) {
+        if (confirm("Are you sure?") == true) {
+          window.location.href = "/finishTask/"+id;
+        }
+      }
+    function taskDelete(id) {
+        if (confirm("Are you sure?") == true) {
+          window.location.href = "/taskDelete/"+id+'/1';
+        }
+      }
+  </script>
+
+
+{% endfor %}
+
+{% else %}
+<center><h5 class="mb-5 mt-4 text-muted">-- Empty --</h5></center>
+{% endif %}
+{% endblock %}
+
+
+

@@ -1,0 +1,448 @@
+{% extends "Header.html" %}
+
+{% block HeadMainTeam %}
+{% load static %}
+
+{% for task in all_Tasks %}
+
+
+  
+
+
+
+  
+{% endfor %}
+
+
+
+
+    <div class="container">
+
+      <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+        <div class="position-sticky">
+          <div class="list-group nav nav-pills list-group-flush mx-3 mt-4">
+
+            <a href="#projectInfo" data-bs-toggle="pill" class="list-group-item list-group-item-action py-2 ripple active" aria-current="true">
+              <i class="	fas fa-info fa-fw me-3"></i><span>Project Info</span>
+            </a>
+
+            <a href="#tasks" data-bs-toggle="pill" class="list-group-item list-group-item-action py-2 ripple" aria-current="true" >
+              <i class="fas fa-tasks fa-fw me-3"></i>Project Tasks</a>
+            <a href="#myTasks" data-bs-toggle="pill" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+              <i class="fas fa-clipboard fa-fw me-3"></i> My Tasks</a>
+          
+          </div>
+        </div>
+        <a href="\toViewTeam"  class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+          <i class="fas fa-chevron-left fa-fw me-3"></i><span>Back to team</span>
+        </a>
+      </nav>
+
+
+      
+
+
+        <div class="tab-content">
+            <div  id="projectInfo" class="animated fade-in-left container tab-pane active">
+              {% for message in messages %}
+              <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>Alert: </strong> {{message}}
+              <button class="btn-close" data-bs-dismiss="alert">      
+              <span aria-hidden="true">&times;</span> 
+              </button>
+              </div>
+              {% endfor %}<br>
+                <div class="container mt-3 p-5 card border border-3 border-top-0  bg-light text-black">
+                    <center><h1 class="text-primary">{{project.title}}</h1></center>
+                    <hr width="100%">
+                     <br>
+                     {% if  project.is_Done == False %}
+                     <div class="progress" style="height:15px;border-radius: 5px;">
+                       <div class="progress-bar" id="projectProgress{{project.id}}" style="width: {% if project.progress == '0.0%' or project.progress == '0%' %}5%{% else %}{{ project.progress }}{% endif %};">{{project.progress}}</div>
+                     </div>
+                     {% endif %}
+
+                  </div>
+                  <div class="container w-75 p-5 card border border-2 border-top-0 bg-light text-black">
+                    {{project.description}}
+                  </div>
+                 
+            </div>
+          
+
+            <div id="tasks" class="container-fluid tab-pane fade"><br>
+                
+              <div class="top" style="display: flex;align-items: center;justify-content: space-between;">
+                <div class="left">
+                  <h3 style="color: rgb(3, 67, 67);"><img src="{% static 'img\Tasks.png' %}" alt="" style="width: 50px;margin-right: 10px;">Project Tasks | In-Progress</h3>
+                </div>
+                
+                <div class="right d-flex align-items-center">
+
+
+                  <a type="button" class="dropdown-toggle btn btn-primary m-2" href="#" role="button" data-bs-toggle="dropdown" onclick="
+                  document.getElementById('first2').className = 'dropdown-item nav-link';
+                  document.getElementById('sec2').className = 'dropdown-item nav-link'
+                  "><i class="fas fa-stream fa-fw me-3"></i><span>Show</span>
+                  </a>
+                    <ul class="dropdown-menu">
+                     <ul class=" nav nav-pill" role="tablist">
+                      <li><a id="first2" class="dropdown-item nav-link" data-bs-toggle="pill" href="#tasks">In-Progress Tasks</a></li>
+                      <li><a id="sec2" class="dropdown-item nav-link" data-bs-toggle="pill" href="#doneTasks" >Completed Tasks</a></li>
+                     </ul>
+                  </ul>
+    
+                  
+                   
+                    {% if myProfile == new_Team.leader %}
+                    <button type="button" class="btn btn-primary btn m-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                      <i class="fas fa-plus fa-fw me-3"></i><span>Add Task</span>
+                    </button>
+                    {% endif %}
+               
+                  </div>
+              </div>
+
+
+              <hr style="width: 80;">
+
+
+            <div class="row mb-3">
+            {% for task in all_Tasks %}
+
+            {% if task.project == project and task.is_Done == False %}
+            {% if task.dependsOn is not None %}
+            <div class="shadow card ms-5 my-4 col-sm-6 col-xs-12 bg-light text-dark border border-bottom-0" style="width: 550px;">
+              <div class="card-header">
+                
+                <div class="d-flex justify-content-between">
+                  <p class="card-text"><small class="text-muted">To: {{ task.forUser.owner.username }}</small></p>
+                  <p class="card-text"><small class="text-muted">Task number: {{task.id}}</small></p>
+                 </div>
+              </div>
+              <div class="card-body">  
+                <br>
+              <center>
+                <h5><< Content Hidden >></h5>
+                <h5>This task is depends on task with number</h5>
+                <h5>-> ({{ task.dependsOn.id }})</h5></center>
+              </div>
+            </div>
+
+            {% else %}
+            <div class="shadow card ms-5 my-4 col-sm-6 col-xs-12 bg-light text-dark border border-bottom-0" style="width: 550px;">
+              <div class="card-header">
+                <div class="d-flex justify-content-between">
+                  <p class="card-text"><small class="text-muted">To: {{ task.forUser.owner.username }}</small></p>
+                  <p class="card-text"><small class="text-muted">Task number: {{task.id}}</small></p>
+                 </div>
+                 <p class="card-text"><small class="text-muted">Starts: {{task.created_Date}}</small></p>
+              </div>
+              <div class="p-3">  
+              <h5 class="card-title" style="height: 30px; overflow: hidden;text-overflow: ellipsis;">{{task.title}}</h5>
+             </div>
+              <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                 <p class="card-text"><small class="text-muted">Deadline {{task.deadLine}} Days</small></p>
+                 <p class="card-text"><small class="text-muted">Daysleft {{task.days_left}} Days</small></p>                  
+                </div>
+              
+                {% if  task.is_Done == False %}
+                <div class="progress" style="height:15px;border-radius: 5px;">
+                  <div class="progress-bar" id="taskProgress{{task.id}}" style="width: {% if task.progress == '0.0%' or task.progress == '0%' %}5%{% else %}{{ task.progress }}{% endif %};">{{task.progress}}</div>
+                </div>
+                {% endif %}
+                <br>
+                <div class="d-flex justify-content-between align-items-center">
+                  <button onclick="details('{{task.id}}','{{task.progress}}')" type="button" class="btn btn-primary btn m-2 " data-bs-toggle="modal" data-bs-target="#taskInfoModal{{task.id}}">
+                    <i class="fas fa-info fa-fw me-3"></i><span>Details</span>
+                  </button>                  
+
+                  <!--Doha section-->
+                  
+                
+                  {% if myProfile == new_Team.leader %}
+                  <button type="button" class="btn btn-primary btn m-2" data-bs-toggle="modal" data-bs-target="#extendDeadline{{task.id}}">
+                    <i class="fas fa-arrows-alt-h me-3"></i><span>Extend/Reduce Deadline</span>
+                  </button>
+                  <button type="button" onclick="taskDelete()" class="btn btn-danger ">Delete</button>
+                  {% endif %}
+               
+                  <script>
+                    function taskDelete() {
+                      if (confirm("Are you sure?") == true) {
+                       window.location.href = "/taskDelete/"+"{{task.id}}";
+                      }
+                    }
+                  </script>
+                </div>
+  
+              </div>
+
+            </div>
+
+              {% endif %}
+              {% endif %}
+           
+              {% endfor %}
+           </div>
+  
+  
+      
+        </div>
+            
+
+            <div id="doneTasks" class="container tab-pane fade"><br>
+              <div class="top" style="display: flex;align-items: center;justify-content: space-between;">
+                <div class="left">
+                  <h3 style="color: rgb(3, 67, 67);"><img src="{% static 'img\Tasks.png' %}" alt="" style="width: 50px;margin-right: 10px;">Project Tasks | Completed</h3>
+                </div>
+                
+                <div class="right d-flex">
+                    <a type="button" class="dropdown-toggle btn btn-primary m-2" href="#" role="button" data-bs-toggle="dropdown" onclick="
+                    document.getElementById('first2').className = 'dropdown-item nav-link';
+                    document.getElementById('sec2').className = 'dropdown-item nav-link'
+                    "><i class="fas fa-stream fa-fw me-3"></i><span>Show</span>
+                    </a>
+                      <ul class="dropdown-menu">
+                       <ul class=" nav nav-pill" role="tablist">
+                        <li><a id="first2" class="dropdown-item nav-link" data-bs-toggle="pill" href="#tasks">In-Progress Tasks</a></li>
+                        <li><a id="sec2" class="dropdown-item nav-link" data-bs-toggle="pill" href="#doneTasks" >Completed Tasks</a></li>
+                       </ul>
+                    </ul>
+    
+              
+                    {% if myProfile == new_Team.leader %}
+                    <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                      <i class="fas fa-plus fa-fw me-3"></i><span>Add Task</span>
+                    </button>
+                   {%endif%} 
+            
+                </div>
+              </div>
+
+
+
+              <hr style="width: 80;">  
+  
+            <div class="row mb-3">
+              {% for task in all_Tasks %}
+           
+              {% if task.project == project and task.is_Done == True %}
+
+              <div class="shadow card ms-5 my-4 col-sm-6 col-xs-12 bg-light text-dark border border-bottom-0" style="width: 550px;">
+                <div class="card-header">
+                  <div class="d-flex justify-content-between">
+                    <p class="card-text"><small class="text-muted">To: {{ task.forUser.owner.username }}</small></p>
+                    <p class="card-text"><small class="text-muted">Started: {{task.created_Date}}</small></p>
+                   </div>
+                  
+                </div>
+                <div class="p-3">  
+                <h5 class="card-title" style="height: 30px; overflow: hidden;text-overflow: ellipsis;">{{task.title}}</h5>
+               </div>
+                <div class="card-footer">
+                  <div class="d-flex justify-content-between">
+                    <p class="card-text"><small class="text-muted">Deadline {{task.deadLine}} Days</small></p>
+                    <p class="card-text"><small class="text-muted">Finished at {{task.finishedDate}}</small></p>
+
+                  </div>
+                 <div class="d-flex justify-content-between align-items-center">
+                  <button type="button" class="btn btn-primary btn m-2 " data-bs-toggle="modal" data-bs-target="#taskInfoModal{{task.id}}">
+                    <i class="fas fa-info fa-fw me-3"></i><span>Details</span>
+                  </button>  
+                   <i class="fas fa-check-circle fa-2x"></i>
+                  </div>
+    
+                </div>
+                
+              </div>
+  
+              {% endif %}
+    
+              {% endfor %}
+            </div>
+  
+  
+            </div>
+            <div id="myTasks" class="container tab-pane fade"><br>
+              <div class="top" style="display: flex;align-items: center;justify-content: space-between;">
+                <div class="left">
+                  <h3 style="color: rgb(3, 67, 67);"><img src="{% static 'img\Tasks.png' %}" alt="" style="width: 50px;margin-right: 10px;">My Tasks | In-Progress</h3>
+                </div>
+                
+                <div class="right d-flex">
+                 
+                  <a type="button" class="dropdown-toggle btn btn-primary  m-2" href="#" role="button" data-bs-toggle="dropdown" onclick="
+                  document.getElementById('first3').className = 'dropdown-item nav-link';
+                  document.getElementById('sec3').className = 'dropdown-item nav-link'
+                  "><i class="fas fa-stream fa-fw me-3"></i><span>Show</span></a>
+                    <ul class="dropdown-menu">
+                     <ul class=" nav nav-pill" role="tablist">
+                      <li><a id="first3" class="dropdown-item nav-link" data-bs-toggle="pill" href="#myTasks">In-Progress Tasks</a></li>
+                      <li><a id="sec3" class="dropdown-item nav-link" data-bs-toggle="pill" href="#doneMyTasks" >Completed Tasks</a></li>
+                     </ul>
+                  </ul>
+            
+                  {% if myProfile == new_Team.leader %}
+                  <button type="button" class="btn btn-primary  m-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                    <i class="fas fa-plus fa-fw me-3"></i><span>Add Task</span>
+                  </button>
+                 {%endif%} 
+  
+
+                </div>
+              </div>
+
+
+
+              <hr style="width: 80;">  
+  
+            <div class="row mb-3">
+                {% for my_task in my_Tasks %}
+                {% if my_task.project == project and my_task.is_Done == False %}
+                {% if my_task.dependsOn is not None %}
+                <div class="shadow card ms-5 my-4 col-sm-6 col-xs-12 bg-light text-dark border border-bottom-0" style="width: 550px;" >
+                  <div class="card-header">
+                    
+                    <div class="d-flex justify-content-between">
+                      <p class="card-text"><small class="text-muted">To: {{ my_task.forUser.owner.username }}</small></p>
+                      <p class="card-text"><small class="text-muted">Task number: {{my_task.id}}</small></p>
+                     </div>
+                  </div>
+                  <div class="card-body">  
+                    <br>
+                  <center>
+                    <h5><< Content Hidden >></h5>
+                    <h5>This task is depends on task with number</h5>
+                    <h5>-> ({{ my_task.dependsOn.id }})</h5></center>
+                  </div>
+                </div>
+    
+                {% else %}
+                <div class="shadow card ms-5 my-4 col-sm-6 col-xs-12 bg-light text-dark border border-bottom-0" style="width: 550px;">
+                  <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                      <p class="card-text"><small class="text-muted">To: Me</small></p>
+                      <p class="card-text"><small class="text-muted">Task number: {{my_task.id}}</small></p>
+
+                     </div>
+                     <p class="card-text"><small class="text-muted">Starts: {{my_task.created_Date}}</small></p>
+                  </div>
+                  <div class="p-3">  
+                  <h5 class="card-title" style="height: 30px; overflow: hidden;text-overflow: ellipsis;">{{my_task.title}}</h5>
+                 </div>
+                  <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                     <p class="card-text"><small class="text-muted">Deadline {{my_task.deadLine}} Days</small></p>
+                     <p class="card-text"><small class="text-muted">Daysleft {{my_task.days_left}} Days</small></p>                  
+                    </div>
+                    {% if  my_task.is_Done == False %}
+                    <div class="progress" style="height:15px;border-radius: 5px;">
+                      <div class="progress-bar" id="taskProgress{{my_task.id}}" style="width: {% if my_task.progress == '0.0%' or my_task.progress == '0%' %}5%{% else %}{{ my_task.progress }}{% endif %};">{{my_task.progress}}</div>
+                    </div>
+                    {% endif %}
+                    <br>
+                   <div class="d-flex justify-content-between align-items-center">
+                    <button  onclick="details('{{my_task.id}}','{{my_task.progress}}')" type="button" class="btn btn-primary btn m-2 " data-bs-toggle="modal" data-bs-target="#taskInfoModal{{my_task.id}}">
+                      <i class="fas fa-info fa-fw me-3"></i><span>Details</span>
+                    </button>  
+                
+                      {% if myProfile == new_Team.leader %}
+                      <button type="button" class="btn btn-primary btn m-2" data-bs-toggle="modal" data-bs-target="#extendDeadline{{task.id}}">
+                        <i class="fas fa-arrows-alt-h me-3"></i><span>Extend/Reduce Deadline</span>
+                      </button>
+                      <button type="button" onclick="taskDelete()" class="btn btn-danger" style="width: 40%;">Delete</button>
+                      {% endif %}
+                      <script>
+                        function taskDelete() {
+                          if (confirm("Are you sure?") == true) {
+                           window.location.href = "/taskDelete/"+"{{my_task.id}}";
+                          }
+                        }
+                      </script>
+                    </div>
+      
+                  </div>
+                  
+                </div>
+                  {% endif %}
+                  {% endif %}
+                  {% endfor %}
+               </div>
+            
+            </div>
+
+
+            <div id="doneMyTasks" class="container tab-pane fade"><br>
+              <div class="top" style="display: flex;align-items: center;justify-content: space-between;">
+                <div class="left">
+                  <h3 style="color: rgb(3, 67, 67);"><img src="{% static 'img\Tasks.png' %}" alt="" style="width: 50px;margin-right: 10px;">My Tasks | Completed</h3>
+                </div>
+                
+                <div class="right d-flex">
+                  <a type="button" class="dropdown-toggle btn btn-primary m-2" href="#" role="button" data-bs-toggle="dropdown" onclick="
+                  document.getElementById('first4').className = 'dropdown-item nav-link';
+                  document.getElementById('sec4').className = 'dropdown-item nav-link'
+                  "><i class="fas fa-stream fa-fw me-3"></i><span>Show</span>
+                  </a>
+                    <ul class="dropdown-menu">
+                     <ul class=" nav nav-pill" role="tablist">
+                      <li><a id="first4" class="dropdown-item nav-link" data-bs-toggle="pill" href="#myTasks">In-Progress Tasks</a></li>
+                      <li><a id="sec4" class="dropdown-item nav-link" data-bs-toggle="pill" href="#doneMyTasks" >Completed Tasks</a></li>
+                     </ul>
+                  </ul>
+    
+                  {% if myProfile == new_Team.leader %}
+                  <button type="button" class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                    <i class="fas fa-plus fa-fw me-3"></i><span>Add Task</span>
+                  </button>
+                 {%endif%} 
+                </div>
+              </div>
+
+
+
+              <hr style="width: 80;">  
+  
+            <div class="row mb-3">
+              {% for my_task in my_Tasks %}
+              {% if my_task.project == project and my_task.is_Done == True %}
+              <div class="shadow card ms-5 my-4 col-sm-6 col-xs-12 bg-light text-dark border border-bottom-0" style="width: 550px;">
+                <div class="card-header">
+                  <div class="d-flex justify-content-between">
+                    <p class="card-text"><small class="text-muted">To: Me</small></p>
+                    <p class="card-text"><small class="text-muted">Started: {{my_task.created_Date}}</small></p>
+                   </div>
+                  
+                </div>
+                <div class="p-3">  
+                <h5 class="card-title" style="height: 30px; overflow: hidden;text-overflow: ellipsis;">{{my_task.title}}</h5>
+               </div>
+                <div class="card-footer">
+                  <div class="d-flex justify-content-between">
+                   <p class="card-text"><small class="text-muted">Deadline {{my_task.deadLine}} Days</small></p>
+                   <p class="card-text"><small class="text-muted">Finished at {{my_task.finishedDate}}</small></p>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-primary btn m-2 " data-bs-toggle="modal" data-bs-target="#taskInfoModal{{my_task.id}}">
+                      <i class="fas fa-info fa-fw me-3"></i><span>Details</span>
+                    </button>  
+                     <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+    
+                </div>
+                
+              </div>
+                  {% endif %}
+                  {% endfor %}
+               </div>
+            
+           
+
+          </div>
+        </div>
+
+
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "Project/ProjectPage.html" %}
+
+
+{% block TeamContent %}
+
+<p class="text-muted border-bottom"><a href="/toViewTeam/{{team.id}}">{{ team.title }}</a>{% if project %} / <a href="/toViewProject/{{project.id}}">{{ project.title }}</a> {% endif %}/ Members</p>
+
+{% for person in project.members.all %}
+
+  <div class="preview-list px-3 my-2" style="border-radius: 10px;background: #191C24;">
+    <div class="preview-item">
+      <div class="preview-thumbnail">
+        <img src="/{{person.photo}}" alt="image" class="rounded-circle" />
+      </div>
+      <div class="preview-item-content d-flex flex-grow">
+        <div class="flex-grow">
+          <div class="d-flex d-md-block d-xl-flex justify-content-between">
+            <h6 class="preview-subject">{{ person.owner.first_name }} {{ person.owner.last_name }}</h6>
+            
+            {% if request.user.is_authenticated %}
+                {% if myProfile == team.leader %}
+                    {% if person == myProfile %}
+                        <p class="text-muted">You</p>
+                    {% elif person == project.projectLeader %}
+                    <div class="ms-auto d-flex align-items-center">
+                      <button type="button" onclick="projectMemberDelete('{{project.id}}','{{person.id}}')" class="btn btn-outline-primary me-2">Change</button>
+                      <p class="text-success">Project Leader</p>
+                    </div>
+                    {% endif %}  
+                {% else %}
+                    {% if person == project.projectLeader %}
+                        <p class="text-success">Project Leader</p>
+                    {% else %}
+                        <y class="text-muted">Member</y>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            
+          </div>
+                <p class="text-muted">{{ person.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endfor %}
+
+
+
+{% endblock %}

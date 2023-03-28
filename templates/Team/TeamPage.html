@@ -1,0 +1,111 @@
+{% extends "Header.html" %}
+
+{% block TeamHeader %}
+
+
+<li class="nav-item nav-category">
+  <span class="nav-link">Team : {{team.short}}</span>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/toViewTeam/{{ team.id }}">
+    <span class="menu-icon">
+      <i class="mdi mdi-book-open"></i>
+    </span>
+    <span class="menu-title">Team Info</span>
+  </a>
+</li>
+
+<li class="nav-item menu-items">
+  <a class="nav-link" data-toggle="collapse" href="#ui-basic-team-1" aria-expanded="false" aria-controls="ui-basic-team-1">
+    <span class="menu-icon">
+      <i class="mdi mdi-bulletin-board"></i>
+    </span>
+    <span class="menu-title">Projects</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse" id="ui-basic-team-1">
+    <ul class="nav flex-column sub-menu">
+      {% if request.user.is_authenticated %}
+      {% if latest_projects %}
+        {% for project in latest_projects %}
+            <li class="nav-item">
+              <a class="nav-link" href="/toViewProject/{{project.id}}">
+                {% if project.days_Left < 0 %}
+                  <i class="fas fa-exclamation-circle text-danger me-1"></i>
+                {% elif project.days_Left == 0 %}
+                <i class="mdi mdi-message-alert me-1"></i>
+                {% endif %}
+                {{project.title}}
+              </a>
+            </li>
+        {% endfor %}
+
+      <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#projectsModel">Show all</a></li>
+
+      {% else %}
+        <li class="nav-item"><p class="text-muted mt-1 mb-1 ms-1 p-0">There are no projects</p></li>
+      {% endif %}
+
+      {% else %}
+        <li class="nav-item"><p class="text-muted mb-0"> You need to <a href="/login">login</a> </p></li>
+      {% endif %}
+    </ul>
+  </div>
+</li>
+
+
+{% if myProfile == team.leader or myProfile in team.admins.all %}
+<li class="nav-item menu-items">
+  <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#projectCreateModel">
+    <span class="menu-icon">
+      <i class="mdi mdi-calendar-plus"></i>
+    </span>
+    <span class="menu-title">Create project</span>
+  </a>
+</li>
+{% endif %}
+
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/projects/done/{{team.id}}">
+    <span class="menu-icon">
+      <i class="mdi mdi-comment-check-outline" style="color: #00D25B;"></i>
+    </span>
+    <span class="menu-title">Completed projects</span>
+  </a>
+</li>
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/products/{{team.id}}">
+    <span class="menu-icon">
+      <i class="mdi mdi-codepen"></i>
+    </span>
+    <span class="menu-title">Products</span>
+  </a>
+</li>
+<li class="nav-item menu-items">
+  <a class="nav-link" href="/members/{{team.id}}">
+    <span class="menu-icon">
+      <i class="mdi mdi-account-multiple-outline"></i>
+    </span>
+    <span class="menu-title">Members</span>
+  </a>
+</li>
+
+{% block ProjectHeader %}
+{% endblock ProjectHeader %}
+
+{% endblock TeamHeader %}
+
+{% block Content %}
+
+  {% block TeamContent %}
+  {% endblock TeamContent %}
+
+{% endblock Content %}
+
+
+
+
+
+
+

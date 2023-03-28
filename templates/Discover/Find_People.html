@@ -1,0 +1,165 @@
+{% extends "Header.html" %}
+{% load static %}
+{% block Content %}
+
+
+<div class="row mb-3 border-bottom">
+    <div class="col-md-12 grid-margin stretch-card flex-grow d-flex align-items-stretch">
+
+        <h2><i class="mdi mdi-account-search"></i> People</h2>
+
+
+    </div>
+
+</div>
+
+
+
+{% for person in people %}
+
+<!-- Invite model -->
+<div class="modal fade" id="invite{{ person.id }}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Select team</h4>
+          <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <form action="/addMembers/{{person.id}}" class="was-validated" method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+
+                  <select class="js-example-basic-single" style="width:100%" name="team" required>
+                    {% for team in inviteTeams %}
+
+                      {% if person not in team.members.all %}
+                      <option>{{ team.title }}</option>
+                      {% endif %}
+
+                    {% endfor %}
+                  </select>
+
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-block enter-btn mt-3">Send</button>
+                </form>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-list my-2 px-3 bg-dark" style="border-radius: 10px;">
+    <div class="preview-item">
+      <div class="preview-thumbnail">
+        <img src="/{{person.photo}}" alt="image" class="rounded-circle" />
+      </div>
+      <div class="preview-item-content d-flex flex-grow">
+        <div class="flex-grow">
+          <div class="d-flex d-md-block d-xl-flex justify-content-between">
+            <h6 class="preview-subject">{{ person.owner.first_name }} {{ person.owner.last_name }}</h6>
+
+            {% if request.user.is_authenticated %}
+            {% if myTeams %}
+
+              {% if person == myProfile %}
+                <p class="text-muted">You</p>
+
+              {% elif person in myPeople %}
+                <p class="text-muted">Team member</p>
+              {% else %}
+
+                  {% if canInvite %}
+
+                    <button type="button" class="btn btn-outline-primary btn-icon-text" data-bs-toggle="modal" data-bs-target="#invite{{ person.id }}">
+                        <i class="mdi mdi-coffee-to-go"></i> Invite
+                    </button>
+
+
+                  {% endif %}
+                {% endif %}
+
+            {% endif %}
+            {% endif %}
+
+          </div>
+          <p class="text-muted">{{ person.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endfor %}
+
+
+<script>
+window.addEventListener('load', function () {
+  'use strict';
+    var substringMatcher = function(strs) {
+      return function findMatches(q, cb) {
+        var matches, substringRegex;
+
+        // an array that will be populated with substring matches
+        matches = [];
+
+        // regex used to determine if a string contains the substring `q`
+        var substrRegex = new RegExp(q, 'i');
+
+        // iterate through the pool of strings and for any string that
+        // contains the substring `q`, add it to the `matches` array
+        for (var i = 0; i < strs.length; i++) {
+          if (substrRegex.test(strs[i])) {
+            matches.push(strs[i]);
+          }
+        }
+
+        cb(matches);
+      };
+    };
+
+    var namesData = JSON.parse("{{namesData|escapejs}}");
+
+    var names = [];
+    names = namesData.ListNames;
+
+    $('#the-basics .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    }, {
+      name: 'names',
+      source: substringMatcher(names)
+    });
+    // constructs the suggestion engine
+    var names = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.whitespace,
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      // `names` is an array of state names defined in "The Basics"
+      local: names
+    });
+
+    $('#bloodhound .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    }, {
+      name: 'names',
+      source: names
+    });
+})
+
+  </script>
+
+{% endblock %}

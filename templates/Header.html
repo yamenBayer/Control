@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <!-- Required meta tags -->
+      {% load static %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>Control</title>
+
+      <!-- plugins:css -->
+      <link rel="stylesheet" href="{% static 'assets\vendors\mdi\css\materialdesignicons.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets\vendors\css\vendor.bundle.base.css' %}">
+      <!-- endinject -->
+      <link rel="stylesheet" href="{% static 'assets\vendors\jvectormap\jquery-jvectormap.css' %}">
+      <!-- Font Awesome -->
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css" />
+
+      <!-- Plugin css for this page -->
+      <link rel="stylesheet" href="{% static 'assets\vendors\select2\select2.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets\vendors\select2-bootstrap-theme\select2-bootstrap.min.css' %}">
+
+      <link rel="stylesheet" href="{% static 'assets\vendors\flag-icon-css\css\flag-icon.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets\vendors\owl-carousel-2\owl.carousel.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets\vendors\owl-carousel-2\owl.theme.default.min.css' %}">
+
+      <!-- Bootstrap -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+      <!-- Layout styles -->
+      <link rel="stylesheet" href="{% static 'assets\css\style.css' %}">
+      <!-- End layout styles -->
+      <link rel="png" href="{% static 'img\Logo.png' %}">
+      <style>
+        .sidebar .nav.sub-menu .nav-item .nav-link.active{
+          color: #6c7293;
+        }
+        .sidebar .nav.sub-menu .nav-item .nav-link.active:hover{
+          color: #ffffff;
+        }
+        .dropdown-item:hover{
+          color: #ccc !important;
+        }
+        #profile_photo:hover, #team_photo:hover, #CustomButton:hover {
+          opacity: 0.5;
+          transition: .2s;
+        }
+        a {
+          text-decoration: none !important;
+          transition: ease-in .2s;
+          color: #2991D6;
+        }
+      </style>
+</head>
+<body>
+<!-- The Modal -->
+<div class="modal fade" id="PreviewTeamPhoto">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <img src="../{{team.photo}}" style="overflow-x: auto;" alt="">
+    </div>
+  </div>
+</div>
+
+  <!-- Team create Modal -->
+<div class="modal fade" id="teamCreateModel">
+  <div class="modal-dialog modal-dialog-centered model-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Create new team</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+          <form action="/createTeam" class="was-validated" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control p_input" id="title" placeholder="Enter title" name="title" required>
+              </div>
+              <div class="form-group">
+                <label for="logo">Logo</label>
+                <input type="text" class="form-control p_input" id="logo" placeholder="Enter logo" name="logo" required>
+              </div>
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" class="form-control p_input" name="description" rows="10" cols="50" placeholder="Enter description" required></textarea>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-block enter-btn">Create</button>
+              </div>
+            </form>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Project create Modal -->
+<div class="modal fade" id="projectCreateModel">
+  <div class="modal-dialog modal-dialog-centered model-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Create new project</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+          <form action="/addProject/{{team.id}}" class="was-validated" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control p_input" id="title" placeholder="Enter title" name="title" required>
+              </div>
+
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" class="form-control p_input" name="description" rows="10" cols="50" placeholder="Enter description" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="logo">DeadLine</label>
+                <input class="form-control p_input" type="number" id="deadLine" name="deadLine" min="1" width="50px" required>
+              </div>
+              <div class="form-group">
+                <label for="projectLeader">Project leader</label>
+                <select class="form-select bg-dark text-light" id="projectLeader" name="projectLeader" required>
+                  <option></option>
+                    {% for member in team.members.all %}
+                      {% if team.leader == member %}
+                        <option>Me</option>
+                      {% else %}
+                      <option>{{ member.owner.username }}</option>
+                      {%endif%}
+                    {% endfor %}
+                </select>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-block enter-btn">Create</button>
+              </div>
+            </form>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add task</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form action="/addTask/{{project.id}}" class="was-validated" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="title" class="form-label">Title: </label>
+            <input type="text" class="form-control p_input" id="title" placeholder="Enter title" name="title" required>
+          </div>
+
+          <div class="form-group">
+          <label for="forUser" class="form-label">For User: </label>
+          <select class="form-select bg-dark text-light" id="sel1" name="forUser" required>
+            {% for member in project.members.all %}
+            <option>{{ member.owner.username }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="description" class="form-label">Description: </label>
+          <textarea class="form-control" rows="5" id="description" name="description" required></textarea>
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="deadLine" class="form-label">Deadline: </label>
+          <input class="form-control p_input" type="number" id="deadLine" name="deadLine" min="1" max="30" required>
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="depend" class="form-label">Depend on: "Enter task number"</label>
+          <select class="form-select bg-dark text-light"  id="depend" name="depend">
+
+            <option></option>
+            {% for task in tasks %}
+            {% if task.is_Done == False %}
+              <option>{{ task.id }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-block enter-btn">Add</button>
+        </div>
+    </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Teams Modal -->
+<div class="modal fade" id="teamsModel">
+  <div class="modal-dialog modal-dialog-centered model-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Your Teams</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+              <div class="preview-list w-100">
+                {% for team in myTeams %}
+                  <a type="button" onclick="getTeamFields()" class="preview-item btn btn-dark mb-1" href="/toViewTeam/{{team.id}}">
+                    <div class="preview-thumbnail ms-2">
+                      <img src="https://www.pythonanywhere.com/user/udcontrol/files/home/udcontrol/static/team-images/23/03/27/Main_Logo.jpg" alt="image" class="rounded-circle" />
+                    </div>
+                    <div class="preview-item-content d-flex flex-grow">
+                      <div class="flex-grow">
+                        <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                          <h6 class="mt-2">{{team.title}}</h6>
+                            {% if myProfile == team.leader %}
+                              <p class="text-success mt-2 me-3">Owner</p>
+                            {% elif myProfile in team.admins.all %}
+                              <p class="text-success mt-2 me-3">Admin</p>
+                            {% else %}
+                              <p class="text-muted mt-2 me-3">Member</p>
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                {% endfor %}
+
+              </div>
+            </div>
+          </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Projects Modal -->
+<div class="modal fade" id="projectsModel">
+  <div class="modal-dialog modal-dialog-centered model-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">{{team.title}} Projects</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 grid-margin stretch-card">
+              <div class="preview-list w-100">
+                {% for project in all_Projects %}
+                  {% if myProfile in project.members.all or myProfile == project.projectLeader or myProfile == team.leader %}
+                  <a type="button" class="preview-item btn btn-dark mb-1" href="/toViewProject/{{project.id}}">
+                    <div class="preview-thumbnail ms-2" style="margin-top: 10px;">
+                      <div class="preview-icon bg-primary">
+                        <i class="mdi mdi-file-document"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content d-flex flex-grow">
+                      <div class="flex-grow">
+                        <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                          <h6 class="mt-2">
+                            {{project.title}}
+                            {% if project.days_left < 0 %}
+                            <i class="fas fa-exclamation-circle text-danger me-1"></i>
+                            {% endif %}
+
+                          </h6>
+                            {% if myProfile == project.projectLeader %}
+                              <p class="text-success mt-2 me-3">Project Leader</p>
+                            {% elif myProfile in project.members.all %}
+                              <p class="text-muted mt-2 me-3">Member</p>
+                            {% endif %}
+                        </div>
+                        <div class="progress progress-md portfolio-progress me-2">
+                          <div class="progress-bar bg-success" role="progressbar" style="width: {{project.progress}}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{project.progress}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                  {% else %}
+                  <button type="button" class="preview-item btn btn-dark mb-1" href="/toViewTeam/{{team.id}}" disabled>
+                    <div class="preview-thumbnail ms-2">
+                      <div class="preview-icon bg-primary">
+                        <i class="mdi mdi-file-document"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content d-flex flex-grow">
+                      <div class="flex-grow">
+                        <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                          <h6 class="mt-2">{{project.title}}</h6>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                  {% endif %}
+                {% endfor %}
+
+              </div>
+            </div>
+          </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <div class="container-scroller">
+  <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+      <a class="sidebar-brand brand-logo" style="color: #2991D6 !important;" href="/"><img src="{% static 'img\Logo.png' %}" alt="" style="width: 30px;"> CONTROL</a>
+      <a class="sidebar-brand brand-logo-mini" href="/"><img src="{% static 'img\Logo.png' %}" alt="" style="width: 30px"></a>
+    </div>
+    <ul class="nav">
+
+      <li class="nav-item nav-category">
+        <span class="nav-link">Main</span>
+      </li>
+      <li class="nav-item menu-items">
+        <a class="nav-link" href="/">
+          <span class="menu-icon">
+            <i class="mdi mdi-speedometer"></i>
+          </span>
+          <span class="menu-title">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item menu-items">
+        <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+          <span class="menu-icon">
+            <i class="mdi mdi-text-shadow"></i>
+          </span>
+          <span class="menu-title">Teams</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="ui-basic">
+          <ul class="nav flex-column sub-menu">
+            {% if request.user.is_authenticated %}
+            {% if myTeams %}
+              {% if myTeams.0 %}
+              <li class="nav-item"> <a class="nav-link" href="/toViewTeam/{{myTeams.0.id}}">{{myTeams.0.title}}</a></li>
+              {% endif %}
+              {% if myTeams.1 %}
+              <li class="nav-item"> <a class="nav-link" href="/toViewTeam/{{myTeams.1.id}}">{{myTeams.1.title}}</a></li>
+              {% endif %}
+              {% if myTeams.2 %}
+              <li class="nav-item"> <a class="nav-link" href="/toViewTeam/{{myTeams.2.id}}">{{myTeams.2.title}}</a></li>
+              {% endif %}
+            <li class="nav-item"> <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#teamsModel">Show all</a></li>
+            {% else %}
+            <li class="nav-item"><p class="text-muted mb-0"> There are no teams </p></li>
+            {% endif %}
+            {% else %}
+            <li class="nav-item"><p class="text-muted mb-0"> You need to <a href="/login">login</a> </p></li>
+            {% endif %}
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item menu-items">
+        <a class="nav-link" data-toggle="collapse" href="#ui-basic2" aria-expanded="false" aria-controls="ui-basic">
+          <span class="menu-icon">
+            <i class="mdi mdi-vector-triangle"></i>
+          </span>
+          <span class="menu-title">Discover</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="ui-basic2">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item"> <a class="nav-link" href="\findTeams">Find Teams</a></li>
+            <li class="nav-item"> <a class="nav-link" href="\findPeople">Find people</a></li>
+
+          </ul>
+        </div>
+      </li>
+
+
+
+
+      {% block TeamHeader %}
+      {% endblock TeamHeader %}
+    </ul>
+  </nav>
+  <!-- partial -->
+  <div class="container-fluid page-body-wrapper">
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar p-0 fixed-top d-flex flex-row">
+
+      <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+
+        <a class=" p-1 mt-3 d-lg-none navbar-brand brand-logo-mini" href="/"><img src="{% static 'img\Logo.png' %}" style="width: 30px" alt="" /></a>
+
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <span class="mdi mdi-menu"></span>
+        </button>
+        <ul class="navbar-nav w-100">
+          <li class="nav-item w-100">
+            <form action="/taskSearch" method="POST" class="d-flex ms-auto">
+              {% csrf_token %}
+              <input type="text" class="form-control" placeholder="Type and search" id="search" name="search" required>
+            </form>
+          </li>
+        </ul>
+
+        <ul class="navbar-nav navbar-nav-right">
+          {% if user.is_authenticated %}
+
+          <li class="nav-item dropdown d-none d-lg-block">
+            <a class="nav-link btn btn-outline-primary create-new-button"  href="/findTeams"><i class="mdi mdi-human-handsup m-0 p-0"></i> Start a team or find one</a>
+          </li>
+
+
+          <li class="nav-item dropdown border-left">
+            <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+              <i class="mdi mdi-bell"></i>
+              {% if flag %}
+              <span id="notySection" class="count bg-danger"></span>
+              {%else%}
+              <span id="notySection"></span>
+              {%endif%}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+              <a class="dropdown-item preview-item" href="/toViewTask_Req">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="fas fa-calendar-check text-primary"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject mb-1">Task requests {% if taskNoty > 0 %}({{taskNoty}}){%endif%}</p>
+                  <p class="text-muted ellipsis mb-0"> Accept/Reject tasks </p>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item preview-item" href="/toViewTeam_Req">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-calendar text-success"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject mb-1">Team requests {% if teamNoty > 0 %}({{teamNoty}}){%endif%}</p>
+                  <p class="text-muted ellipsis mb-0"> Accept/Reject members </p>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item preview-item" href="/toViewSuggestion">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-link-variant text-warning"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject mb-1">Suggestions {% if suggNoty > 0 %}({{suggNoty}}){%endif%}</p>
+                  <p class="text-muted ellipsis mb-0"> Your task suggestions </p>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item preview-item" href="/toViewNotifications">
+                  <p class="p-0 mb-0 text-center">See all notifications {% if notysCount > 0 %}({{notysCount}}){%endif%}</p>
+              </a>
+            </div>
+          </li>
+
+
+          <li class="nav-item dropdown border-left">
+            <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+              <div class="navbar-profile">
+                <img class="img-xs rounded-circle" src="/{{myProfile.photo}}" alt="">
+              </div>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+              <h6 class="p-2 mb-0 ms-2">{{ myProfile.owner.username }}<p class="text-muted p-0 m-0">{{ myProfile.role }}</p></h6>
+
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item preview-item m-0 p-0" href="/signout">
+                <div class="preview-thumbnail m-0 p-0">
+                  <div class="preview-icon m-0 p-0">
+                    <i class="mdi mdi-logout text-danger"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content  m-0 p-0">
+                  <p class="preview-subject mb-1 ms-0">Log out</p>
+                </div>
+              </a>
+            </div>
+          </li>
+
+
+
+
+          {% else %}
+          <li class="nav-item dropdown d-lg-block me-2">
+            <a type="button" class="btn btn-social-icon btn-outline-facebook" style="width:75px;" href="/login">
+              <i class="fas fa-user-alt m-2 text-muted"><br>login</i>
+            </a>
+          </li>
+          <li class="nav-item dropdown d-lg-block me-3">
+            <a type="button" class="btn btn-social-icon btn-outline-facebook" style="width:75px;" href="/signup">
+              <i class="fas fa-user-plus m-2 text-muted "><br>signup</i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+          <span class="mdi mdi-format-line-spacing"></span>
+        </button>
+      </div>
+    </nav>
+
+
+
+    <div class="main-panel">
+      <div class="content-wrapper">
+          {% for message in messages %}
+          {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+          <div class="alert alert-fixed alert-danger bg-dark text-danger alert-dismissible fade show" role="alert">
+          {{message}}
+          <button class="btn-close bg-light text-light m-2 p-1" data-bs-dismiss="alert"></button>
+          </div>
+          {% else %}
+          <div class="alert alert-fixed alert-success alert-dismissible fade show" role="alert">
+            {{message}}
+            <button class="btn-close bg-light text-light m-2 p-1" data-bs-dismiss="alert"></button>
+            </div>
+          {% endif %}
+
+          {% endfor %}
+        {% block Content %}
+
+        {% endblock %}
+      </div>
+
+
+    <footer class="footer">
+      <div class="d-sm-flex justify-content-center justify-content-sm-between">
+        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2023 UD</span>
+        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">
+          <a href="https://www.facebook.com/profile.php?id=100090556133973&mibextid=ZbWKwL" style="color: rgb(32, 135, 191);" target="_blank"><i class="fab fa-facebook me-2" ></i></a>
+          <a href="https://www.youtube.com/channel/UC2ynQeYM2aaaf-LIk-rheNg" style="color: rgb(32, 135, 191);" target="_blank"><i class="fab fa-youtube me-2"></i></a>
+          <a href="mailto:control@unlimited-developers.com" style="color: rgb(32, 135, 191);" target="_blank"><i class="far fa-comment-alt"></i></a>
+
+          </span>
+      </div>
+    </footer>
+    <!-- partial -->
+  </div>
+  <!-- main-panel ends -->
+</div>
+<!-- page-body-wrapper ends -->
+</div>
+<!-- container-scroller -->
+<!-- plugins:js -->
+<script src="{% static 'assets\vendors\js\vendor.bundle.base.js' %}"></script>
+<!-- endinject -->
+<!-- Plugin js for this page -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="{% static 'assets\vendors\jvectormap\jquery-jvectormap.min.js' %}"></script>
+<script src="{% static 'assets\vendors\jvectormap\jquery-jvectormap-world-mill-en.js' %}"></script>
+<script src="{% static 'assets\vendors\owl-carousel-2\owl.carousel.min.js' %}"></script>
+<script src="{% static 'assets\vendors\chart.js\Chart.min.js' %}"></script>
+<script src="{% static 'assets\vendors\progressbar.js\progressbar.min.js' %}"></script>
+
+<!-- End plugin js for this page -->
+<script src="{% static 'assets\vendors\select2\select2.min.js' %}"></script>
+<script src="{% static 'assets\vendors\typeahead.js\typeahead.bundle.min.js' %}"></script>
+
+<!-- inject:js -->
+<script src="{% static 'assets\js\off-canvas.js' %}"></script>
+<script src="{% static 'assets\js\hoverable-collapse.js' %}"></script>
+<script src="{% static 'assets\js\misc.js' %}"></script>
+<script src="{% static 'assets\js\settings.js' %}"></script>
+<script src="{% static 'assets\js\todolist.js' %}"></script>
+<script src="{% static 'assets\js\chart.js' %}"></script>
+<script src="{% static 'assets\js\file-upload.js' %}"></script>
+<script src="{% static 'assets\js\select2.js' %}"></script>
+<script src="{% static 'assets\js\dashboard.js' %}"></script>
+
+
+    </body>
+
+
+
+</html>

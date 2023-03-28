@@ -1,0 +1,117 @@
+{% extends "Team/TeamPage.html" %}
+{% block TeamContent %}
+
+<p class="text-muted border-bottom"><a href="/toViewTeam/{{team.id}}">{{ team.title }}</a> / Complated Projects</p>
+
+{% if complated_Projects %}
+{% for project in complated_Projects %}
+
+<!-- Convert Project to Product Modal -->
+<div class="modal fade" id="convertProjectModal{{project.id}}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Convert project to product</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <p class="text-muted">{{project.name}}</p>
+        <form action="/convert/{{project.id}}" enctype=multipart/form-data class="was-validated" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="title" class="form-label">Title: </label>
+            <input type="text" class="form-control p_input" id="title" placeholder="Enter the title" name="title" required>
+          </div>
+        
+          <div class="form-group">
+            <label for="type" class="form-label">Type: </label>
+            <input type="text" class="form-control p_input" id="type" placeholder="Enter the type" name="type" required>
+          </div>
+
+        <div class="mb-3 mt-3">
+          <label for="description" class="form-label">Description: </label>
+          <textarea class="form-control" rows="5" id="description" name="description" placeholder="Enter the description" required></textarea>
+        </div>
+
+        <div class="mb-3 mt-3">
+          <label for="price" class="form-label">Price: </label>
+          <input class="form-control p_input" type="number" id="price" placeholder="Enter the price" name="price" min="1" required>          
+        </div>
+
+        <div class="mb-3 mt-3">
+          <label for="link" class="form-label">Link: </label>
+          <input class="form-control p_input" type="text" id="link" placeholder="Enter the link to this online product" name="link" min="1" required>          
+        </div>
+        <p class="text-muted border-top border-bottom py-2 mt-2 mb-2">Note: At least one photo is required</p>
+        <div class="form-group">
+          <input type="file" accept="img/*" class="form-control p_input" id="img1"  name="img1" required>
+        </div>
+        <div class="form-group">
+          <input type="file" accept="img/*" class="form-control p_input" id="img2"  name="img2">
+        </div>
+        <div class="form-group">
+          <input type="file" accept="img/*" class="form-control p_input" id="img3"  name="img3">
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-block enter-btn">Convert</button>
+        </div>
+    </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+  <div class="preview-list px-4 my-2" style="background: #191C24;">
+    <div class="preview-item ">
+      <div class="preview-thumbnail">
+        <div class="preview-icon bg-primary">
+          <i class="mdi mdi-file-document"></i>
+        </div>      
+      </div>
+      <div class="preview-item-content d-flex flex-grow">
+        <div class="flex-grow">
+          <div class="d-flex d-md-block d-xl-flex justify-content-between">
+            <h6 class="preview-subject">{{project.title}}</h6>
+            <div>
+              {% if myProfile == project.projectLeader or team.leader == myProfile %}
+                  <button type="button" class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#convertProjectModal{{project.id}}">Convert to product</button>
+                  <button type="button" onclick="projectRecover('{{project.id}}')" class="btn btn-outline-primary me-2">Recover</button>
+                  <button type="button" onclick="projectDelete('{{project.id}}')" class="btn btn-outline-danger">Delete</button>
+              {% endif %}
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function projectDelete(id){
+      if (confirm("Are you sure?") == true) {
+       window.location.href = "/projectDelete/"+id;
+      }   
+    }
+    function projectRecover(id){
+      if (confirm("Are you sure?") == true) {
+       window.location.href = "/projectRecover/"+id;
+      }   
+    }
+  </script>
+{% endfor %}
+{% else %}
+<center><h5 class="text-muted">-- Empty --</h5></center>
+{% endif %}
+
+{% endblock %}

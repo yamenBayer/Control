@@ -1,0 +1,454 @@
+{% extends "Header.html" %}
+
+{% block Content %}
+
+
+
+
+
+<div class="row">
+
+
+   <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+            <h2 class="card-title mb-1"><i class="mdi mdi-assistant"></i> Best team management features</h2>
+          <div class="row">
+            <div class="col-12">
+               <p class="text-muted mb-1">Take your devoloping to the next level</p>
+            </div>
+            <br><br>
+            <div class="col-12">
+               <h6><i class="mdi mdi-calendar text-success"></i> Stay informed of the latest details </h6>
+               <h6><i class="mdi mdi-clock-fast text-success"></i> Faster development time</h6>
+               <h6><i class="mdi mdi-account-multiple-outline text-success"></i> Find people who match your work </h6>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+
+
+
+
+   </div>
+
+   <div class="row">
+
+   <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex flex-row justify-content-between">
+          <h4 class="card-title mb-1"><i class="fas fa-stream"></i> Full Projects Overview</h4>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-12">
+             <div class="preview-list">
+                <div class="preview-item border-bottom">
+                   <div class="preview-thumbnail">
+                     #
+                   </div>
+                   <div class="preview-item-content d-sm-flex flex-grow">
+                     <div class="flex-grow">
+                       <h6 class="preview-subject">Completed Projects</h6>
+                     </div>
+                     <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                       <p class="text-success">{{ myProfile.projects }}</p>
+
+                     </div>
+                   </div>
+
+                 </div>
+                 <div class="preview-item border-bottom">
+                  <div class="preview-thumbnail">
+                    #
+                  </div>
+                  <div class="preview-item-content d-sm-flex flex-grow">
+                    <div class="flex-grow">
+                      <h6 class="preview-subject">In-Progress Projects</h6>
+                    </div>
+                    <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                      <p class="text-success">{{ inprogress_projects }}</p>
+
+                    </div>
+                  </div>
+
+                </div>
+                <div class="preview-item border-bottom">
+                  <div class="preview-thumbnail">
+                    #
+                  </div>
+                  <div class="preview-item-content d-sm-flex flex-grow">
+                    <div class="flex-grow">
+                      <h6 class="preview-subject">Outdated Projects</h6>
+                    </div>
+                    <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                      <p class="text-success">{{ myProfile.o_projects }}</p>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex flex-row justify-content-between">
+          <h4 class="card-title mb-1"><i class="fas fa-stream"></i> Full Tasks Overview</h4>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-12">
+             <div class="preview-list">
+                <div class="preview-item border-bottom">
+                   <div class="preview-thumbnail">
+                     #
+                   </div>
+                   <div class="preview-item-content d-sm-flex flex-grow">
+                     <div class="flex-grow">
+                       <h6 class="preview-subject">Completed Tasks</h6>
+                     </div>
+                     <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                       <p class="text-success">{{ myProfile.tasks }}</p>
+
+                     </div>
+                   </div>
+
+                 </div>
+                 <div class="preview-item border-bottom">
+                  <div class="preview-thumbnail">
+                    #
+                  </div>
+                  <div class="preview-item-content d-sm-flex flex-grow">
+                    <div class="flex-grow">
+                      <h6 class="preview-subject">In-Progress Tasks</h6>
+                    </div>
+                    <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                      <p class="text-success">{{ inprogress_tasks }}</p>
+
+                    </div>
+                  </div>
+
+                </div>
+                <div class="preview-item border-bottom">
+                  <div class="preview-thumbnail">
+                    #
+                  </div>
+                  <div class="preview-item-content d-sm-flex flex-grow">
+                    <div class="flex-grow">
+                      <h6 class="preview-subject">Outdated Tasks</h6>
+                    </div>
+                    <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                      <p class="text-success">{{ myProfile.o_tasks }}</p>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+   <div class="row">
+
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex flex-row justify-content-between">
+            <h4 class="card-title mb-1"><i class="fas fa-project-diagram"></i> Latest Projects</h4>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-12">
+               <div class="preview-list">
+                {% if latest_projects %}
+                {% for project in latest_projects %}
+                <a href="/toViewProject/{{project.id}}">
+
+                  <div class="preview-item border-bottom">
+                     <div class="preview-thumbnail" style="width: auto;">
+                      {% if project.is_Done %}
+                      <i class="fas fa-check-circle text-success" style="font-size: 25px;"></i>
+                      {% elif project.is_outdated %}
+                        <i class="fas fa-times-circle text-danger" style="font-size: 25px;"></i>
+                      {% else %}
+                        {{ project.progress }}
+                      {% endif %}
+                     </div>
+                     <div class="preview-item-content d-sm-flex flex-grow">
+                       <div class="flex-grow">
+                         <h6 class="preview-subject">{{ project.title }}</h6>
+                         <p class="text-muted mb-0">{{ project.team }}</p>
+                       </div>
+                       <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                         <p class="text-muted">Members: {{ project.members.all.count }}</p>
+
+                       </div>
+                     </div>
+
+                   </div> </a>
+                 {% endfor %}
+
+                 {% else %}
+                 <center><h5 class="mb-3 mt-3 text-muted">-- Empty --</h5></center>
+                 {% endif %}
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+
+      <div class="col-md-6 grid-margin stretch-card">
+         <div class="card">
+           <div class="card-body">
+             <div class="d-flex flex-row justify-content-between">
+               <h4 class="card-title mb-1"><i class="far fa-file-alt"></i> Latest Tasks</h4>
+             </div>
+             <hr>
+             <div class="row">
+               <div class="col-12">
+                  <div class="preview-list">
+                    {% if latest_tasks %}
+                    {% for task in latest_tasks %}
+
+                          <!-- Task Info Modal -->
+                          <div class="modal fade" id="taskInfoModal{{task.id}}">
+                            <div class="modal-dialog modal-dialog-centered model-xl">
+                              <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                      <div class="w-100">
+                                        <h4 class="modal-title text-success">{{task.title}}</h4>
+                                        <p class="text-muted py-0 my-0">Posted: {{task.created_Date}}</p>
+                                        <p class="text-muted py-0 my-0">Team: {{task.project.team}}</p>
+                                        <p class="text-muted py-0 my-0">Project: {{task.project}}</p>
+                                        <p class="text-muted py-0 my-0">To: {{task.forUser}}</p>
+                                        <p class="text-muted py-0 my-0">Deadline: {{task.deadLine}} Days</p>
+                                        {% if task.is_Done %}
+                                        <p class="text-muted py-0 my-0">Finished at: {{task.finishedDate}}</p>
+                                        {% elif task.is_Done == False and task.is_Outdated %}
+                                        <p class="text-danger py-0 my-0"><i class="mdi mdi-timer-off me-1"></i>Outdated</p>
+                                        {% else %}
+                                        <p class="text-muted py-0 my-0">Daysleft: {{task.days_left}} Days</p>
+                                        {%endif%}
+                                        {% if task.days_left == 0 and not task.is_Done %}
+                                        <p class="text-warning py-0 my-0"><i class="mdi mdi-message-alert me-1"></i>This is your last day to finish the task!</p>
+                                        {%endif%}
+                                      </div>
+
+                                      {% if task.is_Done == False and task.dependsOn is None %}
+                                      {% if task.forUser == myProfile or task.project.team.leader == myProfile  %}
+                                        <div class="dropdown m-0 p -0">
+
+                                            <i type="button" data-bs-toggle="dropdown" class="dropdown-toggle mdi mdi-settings"></i>
+
+                                            <ul class="dropdown-menu">
+                                                <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#suggest{{task.id}}">Suggest</a></li>
+                                                {% if task.project.projectLeader == myProfile or task.project.team.leader == myProfile %}
+                                                <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#extendDeadline{{task.id}}">Extend/Reduce Deadline</a></li>
+                                                {% endif %}
+                                                <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#process{{task.id}}">Set Process</a></li>
+                                            </ul>
+
+                                        </div>
+                                      {%endif%}
+                                      {%endif%}
+
+                                  <button style="margin-top: -5px;" type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+                                </div>
+                                <!-- Modal body -->
+                                <div class="modal-body p-0">
+
+                                  <p class="text-light p-3">{{task.description}}</p>
+                                  {% if task.is_Done == False %}
+                                  <div class="border-top py-2">
+
+                                    <div class="m-2 progress" style="height:15px;border-radius: 5px;">
+                                      <div class="progress-bar" id="taskProgress{{task.id}}" style="width: {% if task.progress == '0.0%' or task.progress == '0%' %}5%{% else %}{{ task.progress }}{% endif %};">{{task.progress}}</div>
+                                    </div>
+
+                                  </div>
+                                  {% endif %}
+                                </div>
+
+                                <div class="modal-footer">
+                                  {% if task.project.team.leader == myProfile or task.forUser == myProfile %}
+                                  {% if task.is_Done == False and task.progress == '100%' %}
+                                    <a href="/applyTask/{{task.id}}" class="btn btn-success">Apply</a>
+                                  {% elif task.is_Done %}
+                                  <i class="fas fa-check-circle fa-2x text-success"></i>
+                                  {% else %}
+                                  <button type="button" class="btn btn-success" disabled>Apply</button>
+                                  {% endif %}
+                                  {% endif %}
+                                  {% if task.project.team.leader == myProfile or task.project.projectLeader == myProfile %}
+                                    <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'0')">Remove</button>
+                                  {% endif %}
+                                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+<!-- Extend Task Deadline -->
+<div class="modal fade" id="extendDeadline{{task.id}}">
+<div class="modal-dialog">
+  <div class="modal-content">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h4 class="modal-title">Deadline Extend/Reduce</h4>
+      <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+      <form action="/taskDeadlineExtend/{{task.id}}" class="was-validated" method="post">
+        {% csrf_token %}
+        <div class="mb-3 mt-3">
+          <label for="deadLine" class="form-label">Amount: </label>
+          <input type="number" id="deadLine" name="deadLine" required>
+        </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary btn">Accept</button>
+      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+    </div>
+  </form>
+  </div>
+</div>
+</div>
+
+<!-- Suggestion -->
+<div class="modal fade" id="suggest{{task.id}}">
+<div class="modal-dialog">
+  <div class="modal-content">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h4 class="modal-title">Suggest</h4>
+      <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+      <form action="/suggestion/{{task.id}}" class="was-validated mb-3  d-flex align-items-center justify-content-center" method="post" style="margin-right: 105px;">
+        {% csrf_token %}
+          <select class="form-select" id="sugg" name="sugg" required>
+            <option></option>
+            {% for member in new_Team.members.all %}
+            {% if task.forUser != member %}
+              <option>{{ member.owner.username }}</option>
+              {%endif%}
+            {% endfor %}
+          </select>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary btn">Apply</button>
+      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+    </div>
+  </form>
+  </div>
+</div>
+</div>
+
+<!-- Set process -->
+<div class="modal fade" id="process{{task.id}}">
+<div class="modal-dialog">
+  <div class="modal-content">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h4 class="modal-title">Set process value</h4>
+      <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+      <form action="/saveTaskChanges/{{task.id}}/{{task.project.id}}" class="was-validated" method="post">
+        {% csrf_token %}
+          <input class="form-control" type="number" name="process" required>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary btn">Set</button>
+      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+    </div>
+  </form>
+  </div>
+</div>
+</div>
+
+                      <a href="#" data-bs-toggle="modal" data-bs-target="#taskInfoModal{{task.id}}">
+
+                     <div class="preview-item border-bottom">
+                        <div class="preview-thumbnail" style=" width: auto;">
+                          {% if task.is_Done %}
+                            <i class="fas fa-check-circle text-success" style="font-size: 25px;"></i>
+                          {% elif task.is_outdated %}
+                            <i class="fas fa-times-circle text-danger" style="font-size: 25px;"></i>
+                          {% else %}
+                            {{ task.progress }}
+                          {% endif %}
+
+                        </div>
+                        <div class="preview-item-content d-sm-flex flex-grow">
+                          <div class="flex-grow">
+                            <h6 class="preview-subject">{{ task.title }}</h6>
+                            <p class="text-muted mb-0">{{ task.project }}</p>
+                          </div>
+                          <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                            <p class="text-muted">Task Number: {{ task.id }}</p>
+
+                          </div>
+                        </div>
+
+                      </div> </a>
+                    {% endfor %}
+                    {% else %}
+                    <center><h5 class="mb-3 mt-3 text-muted">-- Empty --</h5></center>
+                    {% endif %}
+
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+      </div>
+   </div>
+
+   <script>
+    function taskDelete(id,type) {
+        if (confirm("Are you sure?") == true) {
+          window.location.href = "/taskDelete/"+id+"/"+type;
+        }
+      }
+  </script>
+
+
+
+    {% endblock %}
+

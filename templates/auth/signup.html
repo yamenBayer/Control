@@ -1,0 +1,100 @@
+{% extends "auth/Auth_Layout.html" %}
+
+{% block AuthContent %}
+
+
+{% for message in messages %}
+{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+<div class="alert alert-fixed alert-danger bg-dark text-danger alert-dismissible fade show" role="alert">
+{{message}}
+<button class="btn-close bg-light text-light m-2 p-1" data-bs-dismiss="alert"></button>
+</div>
+{% else %}
+<div class="alert alert-fixed alert-success alert-dismissible fade show" role="alert">
+  {{message}}
+  <button class="btn-close bg-light text-light m-2 p-1" data-bs-dismiss="alert"></button>
+  </div>
+{% endif %}
+
+{% endfor %}
+<!-- Terms model -->
+<div class="modal fade" id="Terms_Conditions">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Terms & Conditions</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Fuga quae soluta aliquam maiores laborum aperiam recusandae dolore veritatis iste odit necessitatibus voluptatibus, iure enim doloribus temporibus, minus consequatur rerum expedita sed quos cum! Voluptatibus excepturi architecto molestias tenetur perspiciatis amet nemo, reiciendis quod incidunt quos dicta delectus odit, velit sunt.
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<h3 class="card-title text-left mb-4"><i class="fas fa-user-plus" style="margin-right:10px"></i>Register</h3>
+<hr>                
+<form action="/signup" enctype=multipart/form-data class="was-validated" method="post">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <label for="uname">Username</label>
+                    <input type="text" class="form-control p_input" id="uname" placeholder="Enter username" name="uname" required>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between;margin-bottom: 15px;">
+                    <div style="margin-right: 20px;">
+                    <label for="fname" style="font-size: 15px;">First name</label>
+                    <input type="text" class="form-control" id="fname" placeholder="Enter first name" name="fname" required>        
+                    </div>
+                    <div>
+                    <label for="lname" style="font-size: 15px;">Last name</label>
+                    <input type="text" class="form-control" id="lname" placeholder="Enter last name" name="lname" required>        
+                    </div>
+                </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control p_input" id="email" placeholder="Enter email" name="email" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="role">Role</label>
+                    <input type="text" class="form-control p_input" id="role" placeholder="Enter your role/position" name="role">
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between;margin-bottom: 15px;">
+                      <div style="margin-right: 20px;">
+                        <label for="pwd1">Password</label>
+                        <input type="password" class="form-control p_input" id="pwd" placeholder="Enter password" name="pswd1" required>
+                      </div>
+                      <div>
+                        <label for="pwd2">Confirm password</label>
+                        <input type="password" class="form-control p_input" id="pwd" placeholder="confirm password" name="pswd2" required>
+                      </div>
+                  </div>
+
+    
+                  <div class="form-group d-flex align-items-center justify-content-between">
+                  </div>
+                  <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-block enter-btn">Sign up</button>
+                  </div>
+                  <p class="sign-up text-center m-2">Already have an Account?<a href="/login"> Login</a></p>
+                  <p class="sign-up text-center m-2">Forget your password?<a href="/password_reset"> Forgot password</a></p>
+                  <p class="terms m-2">By creating an account you are accepting our
+                    <a type="button" style="color: rgb(84, 84, 230);text-decoration: none;" data-bs-toggle="modal" data-bs-target="#Terms_Conditions">
+                     Terms & Conditions
+                    </a>
+                  </p>
+                  <p class="sign-up text-center  mt-3"><a href="/">Back Home</a></p>
+                </form>
+
+{% endblock  %}

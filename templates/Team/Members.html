@@ -1,0 +1,57 @@
+{% extends "Team/TeamPage.html" %}
+
+{% load static %}
+{% block TeamContent %}
+
+<p class="text-muted border-bottom"><a href="/toViewTeam/{{team.id}}">{{ team.title }}</a> / Members</p>
+
+{% for person in team.members.all %}
+
+  <div class="preview-list px-3 my-2" style="border-radius: 10px;background: #191C24;">
+    <div class="preview-item">
+      <div class="preview-thumbnail">
+        <img src="/{{person.photo}}" alt="image" class="rounded-circle" />
+      </div>
+      <div class="preview-item-content d-flex flex-grow">
+        <div class="flex-grow">
+          <div class="d-flex d-md-block d-xl-flex justify-content-between">
+            <h6 class="preview-subject">{{ person.owner.first_name }} {{ person.owner.last_name }}</h6>
+            
+            {% if request.user.is_authenticated %}
+                {% if myProfile == team.leader %}
+                    {% if person == myProfile %}
+                        <p class="text-muted">You</p>
+                    {% else %}
+                    <div>
+                        {% if person not in team.admins.all %}
+                            <button type="button" onclick="memberPromote('{{person.id}}')" class="btn btn-outline-success me-2">Promote</button>
+                        {% else %}
+                            <y class="text-success me-2">Admin</y>
+                        {% endif %}
+                        <button type="button" onclick="memberDelete('{{person.id}}')" class="btn btn-outline-danger">Kick out</button>
+                    </div>
+                    {% endif %}
+                {% elif myProfile in team.admins.all and person == myProfile %}
+                    <p class="text-success">Admin</p>
+                {% else %}
+                    {% if person == team.leader %}
+                        <p class="text-success">Team Leader</p>
+                    {% elif person in team.admins.all %}
+                        <y class="text-success">Admin</y>
+                    {% else %}
+                        <y class="text-muted">Member</y>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            
+          </div>
+                <p class="text-muted">{{ person.role }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endfor %}
+
+
+{% endblock %}
