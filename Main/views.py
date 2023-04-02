@@ -67,7 +67,7 @@ def get_home_values():
   inprogress_tasks = Task.objects.filter(is_Done=False, forUser = myProfile).count()
 
   latest_projects = Project.objects.filter(members=myProfile).order_by('-started_Date')[:5]
-  latest_tasks = rev(Task.objects.filter(project__in=latest_projects,dependsOn=None).order_by('-created_Date')[:5])
+  latest_tasks = Task.objects.filter(project__in=latest_projects,dependsOn=None).order_by('-created_Date')[:5]
 
   return inprogress_projects, inprogress_tasks, latest_projects, latest_tasks
 
@@ -143,7 +143,7 @@ def Broadcast(array, title):
 
 def getFlag():
   flag = False
-  if Notification.objects.filter(forUser = myProfile,isSeen = False).exists() or Team_Request.objects.filter(userToJoin = myProfile, isUser = False).exists() or Task_suggest.objects.filter(forUser = myProfile).exists():
+  if Notification.objects.filter(forUser = myProfile,toBeSeen = False).exists() or Team_Request.objects.filter(userToJoin = myProfile, isUser = False).exists() or Task_suggest.objects.filter(forUser = myProfile).exists():
     flag = True
   teams = getProfileTeams(myProfile)
   for team in teams:
@@ -1076,7 +1076,7 @@ def toViewTeam_Req(request):
 
             'notysCount': notysCount,
       'teamNoty': teamNoty,
-      'flag': flag,
+      'flag': False,
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
       })
@@ -1097,7 +1097,7 @@ def toViewTask_Req(request):
 
             'notysCount': notysCount,
       'teamNoty': teamNoty,
-      'flag': flag,
+      'flag': False,
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
       })
@@ -1132,7 +1132,7 @@ def toViewNotifications(request):
 
           'notysCount': notysCount,
       'teamNoty': teamNoty,
-      'flag': flag,
+      'flag': False,
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
     })
@@ -1156,7 +1156,7 @@ def toViewSuggestion(request):
 
             'notysCount': notysCount,
       'teamNoty': teamNoty,
-      'flag': flag,
+      'flag': False,
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
       })

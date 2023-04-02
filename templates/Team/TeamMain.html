@@ -55,14 +55,33 @@
   <div class="col-md-4 col-xl-4 mt-2">
 
       <div class="nav-item dropdown m-0 p-0">
-        <div class="m-0 p-0 nav-link">
+        <a class="m-0 p-0 nav-link" id="teamPhotoDropdown" href="#" data-toggle="dropdown">
           <div class="navbar-profile">
-            <img style="width: 100%;border-radius: 10px;" src="/{{team.photo}}" alt="">
+            <img id="team_photo" style="width: 100%;border-radius: 10px;" src="/{{team.photo}}" alt="">
           </div>
+        </a>
+
+
+                <div class="m-0 dropdown-menu dropdown-menu-right navbar-dropdown preview-list">
+                  <a class="dropdown-item preview-item" type="button" data-bs-toggle="modal" data-bs-target="#PreviewTeamPhoto">
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1 ms-0">Preview image</p>
+                    </div>
+                  </a>
+
+                    {% if team.leader == myProfile %}
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" type="button" data-bs-toggle="modal" data-bs-target="#changeTeamPhoto">
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1 ms-0">Change photo</p>
+                    </div>
+                  </a>
+                  {% endif %}
+                </div>
+
         </div>
       </div>
 
-  </div>
 
 
 <div class="col-md-8 col-xl-8 mt-2">
@@ -159,7 +178,7 @@
               {% for member in team.members.all %}
               <div class="preview-item border-bottom">
                 <div class="preview-thumbnail">
-                  <img src="../{{myProfile.photo}}" alt="image" class="rounded-circle" />
+                  <img src="../{{member.photo}}" alt="image" class="rounded-circle" />
                 </div>
                 <div class="preview-item-content d-flex flex-grow">
                   <div class="flex-grow">

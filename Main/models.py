@@ -6,9 +6,9 @@ from django.contrib.auth.models import User
 
 
 class Profile(models.Model):
-    title = models.CharField(max_length=25)
+    title = models.CharField(max_length=50)
     owner = models.OneToOneField(User, related_name='owner' , on_delete= models.CASCADE)
-    role = models.CharField(max_length=25,default="None")
+    role = models.CharField(max_length=50,default="None")
     photo = models.ImageField(upload_to='static/cover-images/%y/%m/%d/',default = 'static/cover-images/default/Login.png')
     isPrime = models.BooleanField(default = False)
     tasks = models.IntegerField(default=0)
@@ -29,7 +29,7 @@ class ProductPhoto(models.Model):
 
 
 
-   
+
 
 class Team(models.Model):
     title = models.CharField(max_length=25, unique = True)
@@ -58,14 +58,14 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class Team_Request(models.Model):
     title = models.CharField(max_length=15,default="Team Request")
     teamToJoin = models.ForeignKey(Team, related_name='Team_to_join', on_delete=models.CASCADE)
     userToJoin = models.ForeignKey(Profile, related_name='User_to_join', on_delete= models.CASCADE)
     isUser = models.BooleanField(default=False)
     created_Date = models.DateField(default=datetime.now)
-    
+
     def __str__(self):
         return self.title
 
@@ -76,8 +76,8 @@ class Project(models.Model):
     team = models.ForeignKey(Team, related_name='TeamForProject', on_delete=models.CASCADE)
     projectLeader = models.ForeignKey(Profile, related_name='projectLeader' , on_delete= models.CASCADE)
     progress = models.CharField(max_length=100,default="0%")
-    description = models.TextField() 
-    members = models.ManyToManyField(Profile, related_name='projectMembers')   
+    description = models.TextField()
+    members = models.ManyToManyField(Profile, related_name='projectMembers')
     is_Done = models.BooleanField(default=False)
     is_Outdated = models.BooleanField(default=False)
     started_Date = models.DateField(default=datetime.now)
@@ -92,13 +92,13 @@ class Project(models.Model):
         return self.title
 
 
-    
+
 class Task(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Profile, related_name='author' , on_delete= models.CASCADE)
     forUser = models.ForeignKey(Profile, related_name='TaskUser', on_delete= models.CASCADE)
     project = models.ForeignKey(Project, related_name='Project', on_delete=models.CASCADE)
-    description = models.TextField()    
+    description = models.TextField()
     created_Date = models.DateField(default=datetime.now)
     modified_Date = models.DateTimeField(auto_now_add=True, blank=True)
     finishedDate = models.DateField(default=datetime.now)

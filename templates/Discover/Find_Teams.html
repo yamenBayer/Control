@@ -24,12 +24,12 @@
 
             <div class="card-body p-0 m-0">
                 <center>
-                    <div style="width: 100%;height: 290px;background: url('../{{team.photo}}');background-position: center;background-size: cover;"></div>
+                    <div style="width: 100%;height: 290px;background: url('/{{team.photo}}');background-position: center;background-size: cover;"></div>
                 </center>
             </div>
 
             </div>
-     
+
     </div>
     <div class="col-md-8 grid-margin stretch-card">
 
@@ -41,8 +41,8 @@
                 <h5 class="text mb-1">{{ team.title }}</h5>
                 <p class="text-muted mb-1">{{ team.short }}</p>
                 <br>
-                <h5><i class="mdi mdi-calendar-text"></i> Description</h5>   
-                <p class="text-muted">{{ team.description }}</p>             
+                <h5><i class="mdi mdi-calendar-text"></i> Description</h5>
+                <p class="text-muted">{{ team.description }}</p>
             </div>
 
             <div>
@@ -57,17 +57,17 @@
                             <p class="text-muted float-end">Member</p>
                         {% else %}
                             <a type="button" href="/reqJoinTeam/{{team.id}}" class="float-end btn btn-outline-primary">Send Join Request</a>
-                            
-                        {% endif %}     
-                    {% endif %}      
-                {% endif %}     
+
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
             </div>
 
-            
+
           </div>
 
         </div>
-     
+
     </div>
  </div>
 <hr>
@@ -79,13 +79,13 @@
         var substringMatcher = function(strs) {
           return function findMatches(q, cb) {
             var matches, substringRegex;
-      
+
             // an array that will be populated with substring matches
             matches = [];
-      
+
             // regex used to determine if a string contains the substring `q`
             var substrRegex = new RegExp(q, 'i');
-      
+
             // iterate through the pool of strings and for any string that
             // contains the substring `q`, add it to the `matches` array
             for (var i = 0; i < strs.length; i++) {
@@ -93,16 +93,16 @@
                 matches.push(strs[i]);
               }
             }
-      
+
             cb(matches);
           };
         };
-      
+
         var namesData = JSON.parse("{{namesData|escapejs}}");
-      
+
         var names = [];
         names = namesData.ListNames;
-      
+
         $('#the-basics .typeahead').typeahead({
           hint: true,
           highlight: true,
@@ -118,7 +118,7 @@
           // `names` is an array of state names defined in "The Basics"
           local: names
         });
-      
+
         $('#bloodhound .typeahead').typeahead({
           hint: true,
           highlight: true,
@@ -128,7 +128,7 @@
           source: names
         });
     })
-      
+
       </script>
 
 {% endblock %}

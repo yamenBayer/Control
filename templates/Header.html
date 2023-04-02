@@ -30,7 +30,8 @@
       <!-- Layout styles -->
       <link rel="stylesheet" href="{% static 'assets\css\style.css' %}">
       <!-- End layout styles -->
-      <link rel="png" href="{% static 'img\Logo.png' %}">
+      <link rel="shortcut icon" type="image/x-icon" href="{% static 'img\Logo.png' %}" />
+
       <style>
         .sidebar .nav.sub-menu .nav-item .nav-link.active{
           color: #6c7293;
@@ -240,7 +241,7 @@
                 {% for team in myTeams %}
                   <a type="button" onclick="getTeamFields()" class="preview-item btn btn-dark mb-1" href="/toViewTeam/{{team.id}}">
                     <div class="preview-thumbnail ms-2">
-                      <img src="https://www.pythonanywhere.com/user/udcontrol/files/home/udcontrol/static/team-images/23/03/27/Main_Logo.jpg" alt="image" class="rounded-circle" />
+                      <img src="/{{team.photo}}" alt="image" class="rounded-circle" />
                     </div>
                     <div class="preview-item-content d-flex flex-grow">
                       <div class="flex-grow">
@@ -350,8 +351,8 @@
     <div class="container-scroller">
   <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-      <a class="sidebar-brand brand-logo" style="color: #2991D6 !important;" href="/"><img src="{% static 'img\Logo.png' %}" alt="" style="width: 30px;"> CONTROL</a>
-      <a class="sidebar-brand brand-logo-mini" href="/"><img src="{% static 'img\Logo.png' %}" alt="" style="width: 30px"></a>
+      <a class="sidebar-brand brand-logo" style="color: #2991D6 !important;" href="/"><div style="display: flex;align-items: center;"><img src="{% static 'img\Logo.png' %}" alt="" style="width: 30px;margin: 0;"><span class="ms-2"> CONTROL</span></div></a>
+      <a class="sidebar-brand brand-logo-mini" href="/"><img src="{% static 'img\Logo.svg' %}" alt="" style="width: 30px"></a>
     </div>
     <ul class="nav">
 
@@ -428,7 +429,7 @@
 
       <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
 
-        <a class=" p-1 mt-3 d-lg-none navbar-brand brand-logo-mini" href="/"><img src="{% static 'img\Logo.png' %}" style="width: 30px" alt="" /></a>
+        <a class=" p-1 mt-3 d-lg-none navbar-brand brand-logo-mini" href="/"><img src="{% static 'img\Logo.svg' %}" style="width: 30px" alt="" /></a>
 
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
           <span class="mdi mdi-menu"></span>
