@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     title = models.CharField(max_length=50)
+    about = models.TextField(default="")
     owner = models.OneToOneField(User, related_name='owner' , on_delete= models.CASCADE)
     role = models.CharField(max_length=50,default="None")
     photo = models.ImageField(upload_to='static/cover-images/%y/%m/%d/',default = 'static/cover-images/default/Login.png')
@@ -26,8 +27,6 @@ class ProductPhoto(models.Model):
 
     def __str__(self):
         return self.title
-
-
 
 
 

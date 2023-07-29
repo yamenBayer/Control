@@ -9,6 +9,7 @@ urlpatterns = [
     path("password_reset", views.password_reset_request, name="password_reset"),
     path('signup', views.signup, name="signup"),
     path('login', views.log_in, name="login"),
+    path('logout_login', views.logout_login, name="logout_login"),
     path('signout', views.signout, name="signout"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
 
@@ -27,11 +28,12 @@ urlpatterns = [
     path("findTeams", views.find_teams, name="findTeams"),
     path('taskSearch', views.taskSearch, name="taskSearch"),
 
-    
+
     # Profile
-    path("profile", views.profile, name="profile"),
+    path("profile/<id>", views.profile, name="profile"),
     path('changePhoto', views.changePhoto, name="changePhoto"),
     path('changeRole', views.changeRole, name="changeRole"),
+    path('addInfo', views.addInfo, name="addInfo"),
 
     # Team
     path('JoinTeam/<reqId>', views.JoinTeam, name="JoinTeam"),

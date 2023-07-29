@@ -8,7 +8,7 @@
   </div>
 </div>
 
-{% if tasks %}   
+{% if tasks %}
 {% for task in tasks %}
 
 <!-- Task Info Modal -->
@@ -40,19 +40,19 @@
             </div>
 
             {% if task.is_Done == False %}
-            {% if task.forUser == myProfile or new_Team.leader == myProfile %}
+            {% if task.forUser == myProfile or team.leader == myProfile %}
               <div class="dropdown m-0 p -0">
 
                   <i type="button" data-bs-toggle="dropdown" class="dropdown-toggle mdi mdi-settings"></i>
 
                   <ul class="dropdown-menu">
                       <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#suggest{{task.id}}">Suggest</a></li>
-                      {% if task.project.projectLeader == myProfile or new_Team.leader == myProfile %}
+                      {% if task.project.projectLeader == myProfile or team.leader == myProfile %}
                       <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#extendDeadline{{task.id}}">Extend/Reduce Deadline</a></li>
                       {% endif %}
                       <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#process{{task.id}}">Set Process</a></li>
                   </ul>
-                  
+
               </div>
             {%endif%}
             {%endif%}
@@ -65,11 +65,11 @@
         <p class="text-light p-3">{{task.description}}</p>
         {% if task.is_Done == False %}
         <div class="border-top py-2">
-          
+
           <div class="m-2 progress" style="height:15px;border-radius: 5px;">
             <div class="progress-bar" id="taskProgress{{task.id}}" style="width: {% if task.progress == '0.0%' or task.progress == '0%' %}5%{% else %}{{ task.progress }}{% endif %};">{{task.progress}}</div>
           </div>
-          
+
         </div>
         {% endif %}
       </div>
@@ -78,14 +78,16 @@
 
         {% if team.leader == myProfile or task.forUser == myProfile or project.projectLeader == myProfile %}
         {% if task.is_Done == False and task.progress == '100%' %}
-          <a href="/applyTask/{{task.id}}" class="btn btn-success">Apply</a> 
-        {% else %}   
+          <a href="/applyTask/{{task.id}}" class="btn btn-success">Apply</a>
+        {% else %}
         <button type="button" class="btn btn-success" disabled>Apply</button>
         {% endif %}
         {% endif %}
 
         {% if team.leader == myProfile or project.projectLeader == myProfile %}
-        <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}})">Remove</button>
+            {% if task.is_Outdated == False %}
+                <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}})">Remove</button>
+            {% endif %}
         {% endif %}
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
@@ -97,20 +99,20 @@
 <div class="modal fade" id="extendDeadline{{task.id}}">
   <div class="modal-dialog">
     <div class="modal-content">
-  
+
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Deadline Extend/Reduce</h4>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
       </div>
-  
+
       <!-- Modal body -->
       <div class="modal-body">
         <form action="/taskDeadlineExtend/{{task.id}}" class="was-validated" method="post">
           {% csrf_token %}
-            <input class="form-control" type="number" name="deadLine" required>          
+            <input class="form-control" type="number" name="deadLine" required>
       </div>
-  
+
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary btn">Accept</button>
@@ -120,18 +122,18 @@
     </div>
   </div>
   </div>
-  
+
   <!-- Suggestion -->
   <div class="modal fade" id="suggest{{task.id}}">
   <div class="modal-dialog">
     <div class="modal-content">
-  
+
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Suggest</h4>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
       </div>
-  
+
       <!-- Modal body -->
       <div class="modal-body">
         <form action="/suggestion/{{task.id}}" class="was-validated mb-3  d-flex align-items-center justify-content-center" method="post" style="margin-right: 105px;">
@@ -143,9 +145,9 @@
                 <option>{{ member.owner.username }}</option>
                 {%endif%}
               {% endfor %}
-            </select>          
+            </select>
       </div>
-  
+
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary btn">Apply</button>
@@ -155,25 +157,25 @@
     </div>
   </div>
   </div>
-  
+
   <!-- Set process -->
   <div class="modal fade" id="process{{task.id}}">
   <div class="modal-dialog">
     <div class="modal-content">
-  
+
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Set process value</h4>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
       </div>
-  
+
       <!-- Modal body -->
       <div class="modal-body">
         <form action="/saveTaskChanges/{{task.id}}/{{project.id}}" class="was-validated" method="post">
           {% csrf_token %}
-            <input class="form-control" type="number" name="process" required>         
+            <input class="form-control" type="number" name="process" required>
       </div>
-  
+
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary btn">Set</button>
@@ -197,7 +199,7 @@
         <small class="text-danger"><span class="me-2">|</span>Outdated</small>
       </div>
     <div class="col-md-2 col-xl-2">
-        <small class="text-muted">To: {{ task.forUser.owner.username }}</small> 
+        <small class="text-muted">To: {{ task.forUser.owner.username }}</small>
     </div>
   </div>
 
@@ -207,7 +209,7 @@
     <div class="progress-bar bg-danger" id="taskProgress{{task.id}}" style="width: {% if task.progress == '0.0%' or task.progress == '0%' %}5%{% else %}{{ task.progress }}{% endif %};">{{task.progress}}</div>
   </div>
 </div>
-  {% endif %}     
+  {% endif %}
 </a>
   <script>
     function taskDelete(id) {

@@ -6,10 +6,10 @@
 <div class="modal fade" id="PreviewProfilePhoto">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
-      <img src="../{{myProfile.photo}}" style="overflow-x: auto;" alt="">
+      <img src="/{{profile.photo}}" style="overflow-x: auto;" alt="">
     </div>
   </div>
-</div> 
+</div>
 
  <!-- Change photo Modal -->
  <div class="modal fade" id="changePhoto">
@@ -54,7 +54,7 @@
       </div>
       <!-- Modal body -->
       <div class="modal-body">
- 
+
           <form action="/changeRole" enctype=multipart/form-data class="was-validated" method="post">
               {% csrf_token %}
               <div class="form-group">
@@ -73,16 +73,49 @@
   </div>
 </div>
 
+ <!-- Add Info Modal -->
+ <div class="modal fade" id="addInfo">
+  <div class="modal-dialog modal-dialog-centered model-xl">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add Information</h4>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+
+          <form action="/addInfo" enctype=multipart/form-data class="was-validated" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <textarea class="form-control" rows="5" id="info" name="info" required>{{profile.about}}</textarea>
+               </div>
+              <button type="submit" class="btn btn-primary btn-block enter-btn">Add</button>
+           </form>
+
+
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <div class="row border-bottom py-3">
 
   <div class="col-ms-2 col-xl-2">
       <div class="dropdown m-0 p-0">
         <a class="m-0 p-0 nav-link" id="profilePhotoDropdown" href="#" data-toggle="dropdown">
           <div class="navbar-profile">
-            <img id="profile_photo" style="width: 150px;border-radius: 50%;" src="../{{myProfile.photo}}" alt="">
+            <img id="profile_photo" style="width: 100%;border-radius: 50%;" src="/{{profile.photo}}" alt="">
           </div>
         </a>
-        <div class="m-0 dropdown-menu dropdown-menu-right navbar-dropdown preview-list">          
+        <div class="m-0 dropdown-menu dropdown-menu-right navbar-dropdown preview-list">
           <a class="dropdown-item preview-item" type="button" data-bs-toggle="modal" data-bs-target="#PreviewProfilePhoto">
             <div class="preview-item-content">
               <p class="preview-subject mb-1 ms-0">Preview image</p>
@@ -100,76 +133,57 @@
   </div>
 
   <div class="col-ms-8 col-xl-8">
-    <h1 class="mt-3 mb-1">{{myProfile.owner.first_name}} {{myProfile.owner.last_name}}</h1>
-    <p class="text-muted ms-1 mb-1">{{myProfile.role}} <a href="#" data-bs-toggle="modal" data-bs-target="#changeRole"><i class="mdi mdi-border-color"></i></a></p> 
+    <h1 class="mt-3 mb-1">{{profile.owner.first_name}} {{profile.owner.last_name}}</h1>
+    <p class="text-muted ms-1 mb-1">{{profile.role}}
+      {% if request.user == profile.owner %}
+      <a href="#" data-bs-toggle="modal" data-bs-target="#changeRole"><i class="mdi mdi-border-color"></i></a>
+      {%endif%}
+    </p>
+    {% if profile.about == "" and request.user == profile.owner %}
+      <button class="mt-3 btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInfo">Add Infromation About You</button>
+    {%else%}
+      <p class="text-muted ms-1 mt-3 pt-2 border-top">{{profile.about}}
+        {% if request.user == profile.owner %}
+        <a href="#" data-bs-toggle="modal" data-bs-target="#addInfo"><i class="mdi mdi-border-color"></i></a>
+        {%endif%}
+      </p>
+    {%endif%}
   </div>
 
 </div>
+<h3 class=" mt-4 py-2"><i class="mdi mdi-google-circles-extended"></i> Teams</h3>
 
-    {% if teams %}
-    {% for team in teams %}
+    {% if myTeams %}
+    <div class="row">
+    {% for team in myTeams %}
+    <div class="col-md-2 grid-margin stretch-card">
+
+      <div class="card">
+
+        <div class="card-body p-2 m-2">
+          <img class="img rounded-circle me-2 mb-4" style="width: 100%;" src="/{{team.photo}}" alt="">
+          <center>
+            <div>
+              <h5 class="card-title mb-1">{{ team.title }}</h5>
+              <p class="text-muted mb-1">{{ team.short }}</p>
+            </div>
+          </center>
+        </div>
+
+      </div>
+
+  </div>
     {% endfor %}
 
     {% else %}
-
-    <h3 class=" mt-4 py-2"><i class="mdi mdi-google-circles-extended"></i> Teams</h3>
-
-    <div class="row">
-        <div class="col-md-4 grid-margin stretch-card">
-
-            <div class="card">
-
-              <div class="card-body p-2 m-2" style="display: flex;">
-                <img class="img-xs rounded-circle me-2" src="../{{myProfile.photo}}" alt="">
-                <div>
-                  <h5 class="card-title mb-1">{{ team.title }}UDTeam</h5>
-                  <p class="text-muted mb-1">{{ team.short }}Easy besy, Fast and squisy</p>
-                </div>
-              </div>
-
-            </div>
-         
-        </div>
-        <div class="col-md-4 grid-margin stretch-card">
-
-            <div class="card">
-
-              <div class="card-body p-2 m-2" style="display: flex;">
-                <img class="img-xs rounded-circle me-2" src="../{{myProfile.photo}}" alt="">
-                <div>
-                  <h5 class="card-title mb-1">{{ team.title }}UDTeam</h5>
-                  <p class="text-muted mb-1">{{ team.short }}Easy besy, Fast and squisy</p>
-                </div>
-              </div>
-
-            </div>
-         
-        </div>
-        <div class="col-md-4 grid-margin stretch-card">
-
-            <div class="card">
-
-              <div class="card-body p-2 m-2" style="display: flex;">
-                <img class="img-xs rounded-circle me-2" src="../{{myProfile.photo}}" alt="">
-                <div>
-                  <h5 class="card-title mb-1">{{ team.title }}UDTeam</h5>
-                  <p class="text-muted mb-1">{{ team.short }}Easy besy, Fast and squisy</p>
-                </div>
-              </div>
-
-            </div>
-         
-        </div>
-
-    </div>
-    <!-- <h4>No Team</h4> -->
+    <center><h4 class="text-muted">-- No Teams --</h4></center>
     {% endif %}
 
-    <div class="mt-4 mb-2" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="mt-5 mb-2" style="display: flex; justify-content: space-between; align-items: center;">
       <h3 class="py-2"><i class="mdi mdi-elevation-decline"></i> Statistics</h3>
-      <h6 class="text-muted">Full rate: <bl>{{myProfile.rated}}%</bl></h6>
+      <h6 class="me-4 text-muted">Full rate: <bl>{{profile.fullRate}}%</bl></h6>
     </div>
-    
+
     <div class="row">
         <div class="col-md-6 grid-margin">
             <div class="card">
@@ -191,7 +205,117 @@
         </div>
 
     </div>
-    
+
 {% endif %}
+
+
+<script>
+  window.addEventListener('load', function () {
+    console.log("{{years_json|escapejs}}")
+    console.log("{{rate_json|escapejs}}")
+    console.log("{{t_rate_json|escapejs}}")
+
+  var years = JSON.parse("{{years_json|escapejs}}");
+  var rate = JSON.parse("{{rate_json|escapejs}}");
+  var t_rate = JSON.parse("{{t_rate_json|escapejs}}");
+
+  var data = {
+    labels: [years.years[0], years.years[1], years.years[2], years.years[3], years.years[4], years.years[5]],
+    datasets: [{
+      label: '# of Projects',
+      data: [rate.rate[0], rate.rate[1], rate.rate[2], rate.rate[3], rate.rate[4], rate.rate[5]],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)'
+      ],
+      borderColor: [
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)'
+      ],
+      borderWidth: 1,
+      fill: false
+    }]
+  };
+
+  var data2 = {
+    labels: [years.years[0], years.years[1], years.years[2], years.years[3], years.years[4], years.years[5]],
+    datasets: [{
+      label: '# of Tasks',
+      data: [t_rate.rate[0], t_rate.rate[1], t_rate.rate[2], t_rate.rate[3], t_rate.rate[4], t_rate.rate[5]],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(54, 162, 235, 0.2)'
+      ],
+      borderColor: [
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(54, 162, 235, 1)'
+      ],
+      borderWidth: 1,
+      fill: false
+    }]
+  };
+
+  var options = {
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: true
+        },
+        gridLines: {
+          color: "rgba(204, 204, 204,0.1)"
+        }
+      }],
+      xAxes: [{
+        gridLines: {
+          color: "rgba(204, 204, 204,0.1)"
+        }
+      }]
+    },
+    legend: {
+      display: false
+    },
+    elements: {
+      point: {
+        radius: 0
+      }
+    }
+  };
+  if ($("#barChart").length) {
+    var barChartCanvas = $("#barChart").get(0).getContext("2d");
+    // This will get the first returned node in the jQuery collection.
+    var barChart = new Chart(barChartCanvas, {
+      type: 'bar',
+      data: data,
+      options: options
+    });
+  };
+  if ($("#lineChart").length) {
+    var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
+    var lineChart = new Chart(lineChartCanvas, {
+      type: 'line',
+      data: data2,
+      options: options
+    });
+  };
+  })
+</script>
+
+
 
 {% endblock %}

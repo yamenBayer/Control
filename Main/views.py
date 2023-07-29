@@ -1,4 +1,5 @@
 from datetime import date
+import datetime
 from json import dumps
 from tempfile import template
 from turtle import title
@@ -52,22 +53,16 @@ def get_active_users(project):
         count-=1
   return users
 
-def increase_members_rate(members):
-    for member in members:
-      member.projects += 1
-      member.save()
 
-def decrease_members_rate(members):
-    for member in members:
-      member.projects -= 1
-      member.save()
+
+
 
 def get_home_values():
   inprogress_projects = Project.objects.filter(is_Done=False, members = myProfile).count()
   inprogress_tasks = Task.objects.filter(is_Done=False, forUser = myProfile).count()
 
-  latest_projects = Project.objects.filter(members=myProfile).order_by('-started_Date')[:5]
-  latest_tasks = Task.objects.filter(project__in=latest_projects,dependsOn=None).order_by('-created_Date')[:5]
+  latest_projects = Project.objects.filter(members=myProfile, is_Done=False).order_by('-started_Date')[:5]
+  latest_tasks = Task.objects.filter(project__in=latest_projects,dependsOn=None,pending=False,is_Done=False).order_by('-created_Date')[:5]
 
   return inprogress_projects, inprogress_tasks, latest_projects, latest_tasks
 
@@ -90,11 +85,7 @@ def projectdaysLeft_update(project):
   project.days_left = project.deadLine - (date.today() - project.started_Date).days
   if project.days_left < 0 and project.is_Outdated == False:
     project.is_Outdated = True
-    for member in project.members.all():
-      member.o_projects += 1
-      member.save()
-    project.team.o_projects += 1
-    project.team.save()
+
   project.save()
 
 def send_push_notification(subscription, message):
@@ -191,17 +182,13 @@ def getMyPeople(prof, myTeams):
   return final
 
 def getProfileRate(prof):
-      tasksNum = Task.objects.filter(forUser = prof,is_Done = True).count()
-      rate = 0
-      if (Task.objects.filter(forUser = prof).count() > 0):
-        rate = tasksNum/Task.objects.filter(forUser = prof).count()
-      rate *= 100
-      rate = "{:.2f}".format(rate)
-      rate = float(rate)
-      prof.doneTasksNum = tasksNum
-      prof.rated = rate
-      prof.save()
-      pass
+    if (prof.tasks+prof.o_tasks) > 0:
+        rate = (prof.tasks/(prof.tasks+prof.o_tasks))*100
+        rate = "{:.2f}".format(rate)
+        rate = float(rate)
+        prof.fullRate = rate
+        prof.save()
+    pass
 
 def getProfileTeams(prof):
   teams = []
@@ -224,17 +211,17 @@ def UpdateProject(project):
     values = values+"%"
     project.progress = values
     project.days_left = project.deadLine - (date.today() - project.started_Date).days
+    project.tasks = Task.objects.filter(project = project,is_Done = True, is_Outdated=False).count()
+    project.o_tasks = Task.objects.filter(project = project,is_Done = False, is_Outdated=True).count()
     project.save()
 
 def UpdateTasks(tasks):
   for task in tasks:
     task.days_left = task.deadLine - (date.today() - task.created_Date).days
-    if task.days_left < 0 and not task.is_Outdated and not task.is_Done and not task.pending:
+    if task.dependsOn:
+        task.days_left = task.deadLine
+    if task.days_left < 0 and not task.is_Outdated and not task.is_Done and not task.pending and task.dependsOn == None:
       task.is_Outdated = True
-      task.forUser.o_tasks += 1
-      task.project.o_tasks += 1
-      task.forUser.save()
-      task.project.save()
     elif task.days_left >= 0 and task.is_Outdated and not task.is_Done:
       task.is_Outdated = False
     task.save()
@@ -242,43 +229,12 @@ def UpdateTasks(tasks):
 def UpdateTask(task):
   if task:
     task.days_left = task.deadLine - (date.today() - task.created_Date).days
-    if task.days_left < 0 and not task.is_Outdated and not task.is_Done and not task.pending:
+    if task.days_left < 0 and not task.is_Outdated and not task.is_Done and not task.pending and task.dependsOn == None:
       task.is_Outdated = True
-      task.forUser.o_tasks += 1
-      task.project.o_tasks += 1
-      task.forUser.save()
-      task.project.save()
     elif task.days_left >= 0 and task.is_Outdated and not task.is_Done:
       task.is_Outdated = False
     task.save()
 
-
-def toHome(request):
-    if request.user.username == "admin":
-          logout(request)
-    if request.user.is_authenticated:
-      Update(request)
-      notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
-      myTeams = getProfileTeams(myProfile)
-      inprogress_projects,inprogress_tasks,latest_projects,latest_tasks = get_home_values()
-      return render(request , 'index.html',{
-      'myProfile':myProfile,
-      'myTeams':myTeams,
-      'latest_projects': latest_projects,
-      'latest_tasks': latest_tasks,
-      'inprogress_projects': inprogress_projects,
-      'inprogress_tasks': inprogress_tasks,
-
-      'notysCount': notysCount,
-      'teamNoty': teamNoty,
-      'flag': flag,
-      'taskNoty': taskNoty,
-      'suggNoty': suggNoty,
-
-
-      })
-
-    return redirect('login')
 
 def getTasksReq():
     pending_tasks = []
@@ -288,7 +244,7 @@ def getTasksReq():
 
     for project in user_projects:
       if project.projectLeader == myProfile or project.team.leader == myProfile:
-        tasks = Task.objects.filter(project__in=user_projects, pending=True)
+        tasks = Task.objects.filter(project=project, pending=True)
         for task in tasks:
           pending_tasks.append(task)
     return pending_tasks
@@ -315,6 +271,33 @@ def getNotifications():
   return notysCount,teamNoty,flag,taskNoty,suggNoty
 
 
+#############################################################################################
+
+def toHome(request):
+
+
+    Update(request)
+    notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
+    myTeams = getProfileTeams(myProfile)
+    inprogress_projects,inprogress_tasks,latest_projects,latest_tasks = get_home_values()
+    UpdateTasks(latest_tasks)
+    return render(request , 'index.html',{
+    'myProfile':myProfile,
+    'myTeams':myTeams,
+    'latest_projects': latest_projects,
+    'latest_tasks': latest_tasks,
+    'inprogress_projects': inprogress_projects,
+    'inprogress_tasks': inprogress_tasks,
+
+    'notysCount': notysCount,
+    'teamNoty': teamNoty,
+    'flag': flag,
+    'taskNoty': taskNoty,
+    'suggNoty': suggNoty,
+
+
+    })
+
 
 def changePhoto(request):
   if request.user.is_authenticated:
@@ -331,22 +314,37 @@ def changePhoto(request):
 
 def changeTeamPhoto(request, tid):
   if request.user.is_authenticated:
-    if request.method == "POST":
-      img = request.FILES.get('img')
+    try:
       team = Team.objects.get(id = tid)
+    except:
+      return redirect('Home')
+    if request.method == "POST" and myProfile == team.leader:
+      img = request.FILES.get('img')
       team.photo = img
       team.save()
   return redirect('toViewTeam', tid)
 
 def changeRole(request):
   if request.user.is_authenticated:
-    if request.method == "POST":
+    if request.method == "POST" and myProfile == Profile.objects.get(owner = request.user):
       role = request.POST['role']
       try:
         Update(request)
       except Exception:
         return redirect('Home')
       myProfile.role = role
+      myProfile.save()
+  return redirect('profile')
+
+def addInfo(request):
+  if request.user.is_authenticated:
+    if request.method == "POST" and myProfile == Profile.objects.get(owner = request.user):
+      info = request.POST['info']
+      try:
+        Update(request)
+      except Exception:
+        return redirect('Home')
+      myProfile.about = info
       myProfile.save()
   return redirect('profile')
 
@@ -495,6 +493,13 @@ def log_in(request):
 
    return render(request, "auth/login.html")
 
+def logout_login(request):
+    try:
+        logout(request)
+        return redirect('login')
+    except:
+        return redirect('login')
+
 
 
 def signout(request):
@@ -579,27 +584,31 @@ def toViewTeam(request, tid):
       myTeams = getProfileTeams(myProfile)
       all_Projects = Project.objects.filter(team = team, is_Done = False).order_by('-started_Date')
       latest_projects = getlatestProjects(team)
-      # projectsRate = 0
+      tasks_num = c_tasks_num = o_tasks_num = 0
       for project in all_Projects:
         project_update(project)
+        tasks_num += Task.objects.filter(project = project,is_Done = False, is_Outdated=False).count()
+        c_tasks_num += Task.objects.filter(project = project,is_Done = True, is_Outdated=False).count()
+        o_tasks_num += Task.objects.filter(project = project,is_Done = False, is_Outdated=True).count()
 
-        # projectsRate = total/Project.objects.filter(team = team).count()
+      for member in team.members.all():
+        member.tasks = Task.objects.filter(forUser = member,is_Done = True, is_Outdated=False).count()
+        member.o_tasks = Task.objects.filter(forUser = member,is_Done = False, is_Outdated=True).count()
+        member.projects = Project.objects.filter(members = member,is_Done = True, is_Outdated=False).count()
+        member.o_projects = Project.objects.filter(members = member,is_Done = False, is_Outdated=True).count()
 
-
-      # dataDictionary = {
-      #   "projectsRate": projectsRate
-      # }
-
-      # dataJSON = dumps(dataDictionary)
       latest_products = rev(Product.objects.filter(team=team).order_by('-created_Date')[:3])
-      inprogress_projects = Project.objects.filter(is_Done=False, team = team).count()
+      inprogress_projects = Project.objects.filter(is_Done=False,is_Outdated=False, team = team).count()
+      team.projects = Project.objects.filter(is_Done=True,is_Outdated=False, team = team).count()
+      team.o_projects = Project.objects.filter(is_Done=False,is_Outdated=True, team = team).count()
+
       return render(request, "Team/TeamMain.html", {
         'team':team,
         'myTeams':myTeams,
         'all_Projects': all_Projects,
         'latest_projects': latest_projects,
         'latest_products': latest_products,
-        # 'dataJSON': dataJSON,
+
         'myProfile':myProfile,
         'inprogress_projects':inprogress_projects,
 
@@ -608,6 +617,9 @@ def toViewTeam(request, tid):
       'flag': flag,
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
+            'tasks_num': tasks_num,
+      'o_tasks_num': o_tasks_num,
+      'c_tasks_num': c_tasks_num,
         })
 
   return redirect('Home')
@@ -732,7 +744,15 @@ def toViewProject(request, pid):
         all_Projects = Project.objects.filter(team = team, is_Done = False).order_by('-started_Date')
         latest_projects = getlatestProjects(team)
         active_users = get_active_users(project)
-        inprogress_tasks = Task.objects.filter(is_Done=False, project = project).count()
+        tasks = Task.objects.filter(is_Done=False, project = project)
+        inprogress_tasks = Task.objects.filter(is_Done=False, is_Outdated=False, project = project).count()
+        UpdateTasks(tasks)
+        for member in team.members.all():
+            member.tasks = Task.objects.filter(forUser = member,is_Done = True, is_Outdated=False).count()
+            member.o_tasks = Task.objects.filter(forUser = member,is_Done = False, is_Outdated=True).count()
+            member.projects = Project.objects.filter(members = member,is_Done = True, is_Outdated=False).count()
+            member.o_projects = Project.objects.filter(members = member,is_Done = False, is_Outdated=True).count()
+
         return render(request, "Project/ProjectMain.html", {
             'myProfile':myProfile,
             'team':team,
@@ -743,11 +763,11 @@ def toViewProject(request, pid):
             'active_users':active_users,
             'inprogress_tasks':inprogress_tasks,
 
-                  'notysCount': notysCount,
-      'teamNoty': teamNoty,
-      'flag': flag,
-      'taskNoty': taskNoty,
-      'suggNoty': suggNoty,
+            'notysCount': notysCount,
+            'teamNoty': teamNoty,
+            'flag': flag,
+            'taskNoty': taskNoty,
+            'suggNoty': suggNoty,
             })
     else:
       messages.error(request, 'This project cannot be accessed, or it is already finished!')
@@ -826,7 +846,6 @@ def addTask(request, pid):
         new_Task.save()
         new_noty = Notification(title = "There is a new task for you. |  Project name: "+new_Task.project.title+" | Task number: "+str(new_Task.id) ,forUser = new_Task.forUser)
         new_noty.save()
-        print(new_Task.modified_Date)
 
         return redirect('toViewTasks',pid)
 
@@ -919,8 +938,10 @@ def taskDelete(request, tid, type):
     Update(request)
     if Task.objects.filter(id=tid).exists():
       task = Task.objects.get(id=tid)
-      if task.project.projectLeader == myProfile or task.project.team.leader == myProfile:
-        task.delete()
+      if task.is_Outdated == False:
+          if task.project.projectLeader == myProfile or task.project.team.leader == myProfile:
+            task.delete()
+
       match type:
         case "0":
             return redirect('Home')
@@ -960,10 +981,7 @@ def projectRecover(request, pid):
         team = project.team
         if team.leader == myProfile or project.projectLeader == myProfile:
           project.is_Done = False
-          project.team.projects -= 1
-          project.team.save()
           project.save()
-          decrease_members_rate(project.members.all())
         else:
           messages.error(request, "You need premessions!")
       return redirect('toViewProject', project.id)
@@ -1054,7 +1072,6 @@ def toViewTeam_Req(request):
       return redirect('Home')
     myTeams = getProfileTeams(myProfile)
 
-    team = team_req_noty2 = team_req_noty = None
     if Team_Request.objects.filter(userToJoin = myProfile, isUser = False).exists():
       t_req = Team_Request.objects.filter(userToJoin = myProfile, isUser = False)
       for tr in t_req:
@@ -1115,7 +1132,7 @@ def toViewNotifications(request):
 
     notifications = Notification.objects.filter(forUser = myProfile).order_by('-created_Date')[:25]
     Notification.objects.filter(forUser = myProfile).exclude(id__in=notifications.values('id')).delete()
-    notifications = rev(notifications)
+
 
     for noty in notifications:
       if noty.isSeen == False:
@@ -1268,6 +1285,10 @@ def finishTask(request, tid):
     project = task.project
     if task.forUser == myProfile or task.project.projectLeader == myProfile or task.project.team.leader == myProfile:
       task.is_Done = True
+      task.is_Outdated = False
+      task.pending = False
+
+
       task.pending = False
       task.finishedDate = task.modified_Date.date()
       for task2 in Task.objects.filter(project = project):
@@ -1279,11 +1300,6 @@ def finishTask(request, tid):
       task.save()
       noty = Notification(title = task.forUser.owner.username+" finished the task with number: " + str(task.id),forUser = project.team.leader)
       noty.save()
-      if not task.is_Outdated:
-        task.forUser.tasks += 1
-        task.project.tasks += 1
-        task.project.save()
-        task.forUser.save()
 
       return redirect('toViewTasks',project.id)
 
@@ -1320,8 +1336,6 @@ def recoverTask(request, tid):
   return redirect('Home')
 
 def taskSearch(request):
-  if request.user.is_authenticated:
-
     try:
       Update(request)
     except Exception:
@@ -1346,10 +1360,6 @@ def taskSearch(request):
         return render(request,'Search.html',{'myTeams':myTeams,'task':None,'myProfile':myProfile})
 
     return redirect('Home')
-  else:
-    return redirect('login')
-
-
 
 
 def password_reset_request(request):
@@ -1387,18 +1397,26 @@ def password_reset_request(request):
 def taskDeadlineExtend(request, tid):
   if Task.objects.filter(id = tid).exists():
     task = Task.objects.get(id = tid)
+
     if request.method == "POST":
       extendedAmount = request.POST['deadLine']
       extendedAmountINT = int(extendedAmount)
       task.deadLine = task.deadLine + extendedAmountINT
       task.save()
-      if task.is_Outdated:
+      UpdateTask(task)
+
+      # Just another check
+      if task.is_Outdated and task.days_left > 0:
+        task.is_Outdated = False
+
+      if task.days_left < 0:
         return redirect('toViewOutdatedTasks',task.project.id)
+
       return redirect('toViewTasks',task.project.id)
   return redirect('toViewTeam')
 
 def find_teams(request):
-  if request.user.is_authenticated:
+
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     teams = Team.objects.filter()
@@ -1428,11 +1446,11 @@ def find_teams(request):
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
       })
-  return redirect('login')
+
 
 def find_people(request):
-  canInvite = False
-  if request.user.is_authenticated:
+    canInvite = False
+
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     people = Profile.objects.filter()
@@ -1467,17 +1485,59 @@ def find_people(request):
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
       })
-  return redirect('login')
 
-def profile(request):
+
+def profile(request, id):
   if request.user.is_authenticated:
     try:
       Update(request)
+      profile = Profile.objects.get(id = id)
     except Exception:
       return redirect('Home')
-    myTeams = getProfileTeams(myProfile)
-    getProfileRate(myProfile)
-    return render(request, "Profile.html", {'myProfile':myProfile,'myTeams':myTeams})
+    myTeams = getProfileTeams(profile)
+
+
+
+    profile.tasks = Task.objects.filter(forUser = profile,is_Done = True, is_Outdated=False).count()
+    profile.o_tasks = Task.objects.filter(forUser = profile,is_Done = False, is_Outdated=True).count()
+    profile.projects = Project.objects.filter(members = profile,is_Done = True, is_Outdated=False).count()
+    profile.o_projects = Project.objects.filter(members = profile,is_Done = False, is_Outdated=True).count()
+
+    getProfileRate(profile)
+    # get the next 6 years projects done
+    years = [2023,2024,2025,2026,2027,2028]
+    rate = []
+    t_rate = []
+
+    for year in years:
+      start_date = datetime.datetime(year, 1, 1)
+      end_date = datetime.datetime(year, 12, 31)
+      rate.append(Project.objects.filter(members = profile,is_Done = True,is_Outdated=False,started_Date__gte=start_date,started_Date__lt=end_date).count())
+      t_rate.append(Task.objects.filter(forUser = profile,is_Done = True, is_Outdated=False,created_Date__gte=start_date,created_Date__lt=end_date).count())
+
+
+    dict = {
+        "years": years
+    }
+    years_json = dumps(dict)
+    dict = {
+        "rate": rate
+    }
+    rate_json = dumps(dict)
+    dict = {
+        "rate": t_rate
+    }
+    t_rate_json = dumps(dict)
+
+    return render(request, "Profile.html", {
+      'myProfile':myProfile,
+      'profile':profile,
+      'myTeams':myTeams,
+      'years_json':years_json,
+      'rate_json':rate_json,
+      't_rate_json':t_rate_json,
+
+      })
   else:
     return redirect('Home')
 
@@ -1514,15 +1574,12 @@ def finishProject(request, pid):
       project.is_Done = True
       project.finishedDate = date.today()
       project.save()
-      project.team.projects += 1
-      project.team.save()
-      increase_members_rate(project.members.all())
       Broadcast(project.team.members.all(), title = myProfile.owner.username+" finished the project with name: " + str(project.title))
       return redirect('doneProjects',project.team.id)
   return redirect('Home')
 
 def toViewTasks(request, pid):
-  if request.user.is_authenticated:
+
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     myTeams = getProfileTeams(myProfile)
@@ -1550,10 +1607,10 @@ def toViewTasks(request, pid):
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
             })
-  return redirect('Home')
+
+    return redirect('Home')
 
 def toViewMyTasks(request, pid):
-  if request.user.is_authenticated:
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     myTeams = getProfileTeams(myProfile)
@@ -1581,10 +1638,9 @@ def toViewMyTasks(request, pid):
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
             })
-  return redirect('Home')
+    return redirect('Home')
 
 def toViewDoneTasks(request, pid):
-  if request.user.is_authenticated:
     Update(request)
     myTeams = getProfileTeams(myProfile)
     if Project.objects.filter(id = pid).exists():
@@ -1605,10 +1661,9 @@ def toViewDoneTasks(request, pid):
             'tasks':tasks,
             'project':project
             })
-  return redirect('Home')
+    return redirect('Home')
 
 def toViewMyDoneTasks(request, pid):
-  if request.user.is_authenticated:
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     myTeams = getProfileTeams(myProfile)
@@ -1636,17 +1691,16 @@ def toViewMyDoneTasks(request, pid):
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
             })
-  return redirect('Home')
+    return redirect('Home')
 
 def toViewOutdatedTasks(request, pid):
-  if request.user.is_authenticated:
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     myTeams = getProfileTeams(myProfile)
     if Project.objects.filter(id = pid).exists():
       project = Project.objects.get(id = pid)
       team = project.team
-      tasks = Task.objects.filter(project = project, forUser = myProfile, is_Outdated = True,pending=False).order_by('-created_Date')
+      tasks = Task.objects.filter(project = project, is_Outdated = True,pending=False).order_by('-created_Date')
       UpdateTasks(tasks)
       if myProfile == team.leader or myProfile in project.members.all():
         all_Projects = Project.objects.filter(team = team, is_Done = False).order_by('-started_Date')
@@ -1662,22 +1716,21 @@ def toViewOutdatedTasks(request, pid):
             'project':project,
 
                   'notysCount': notysCount,
-      'teamNoty': teamNoty,
-      'flag': flag,
-      'taskNoty': taskNoty,
-      'suggNoty': suggNoty,
+          'teamNoty': teamNoty,
+          'flag': flag,
+          'taskNoty': taskNoty,
+          'suggNoty': suggNoty,
             })
-  return redirect('Home')
+    return redirect('Home')
 
 def toViewPendingTasks(request, pid):
-  if request.user.is_authenticated:
     Update(request)
     notysCount,teamNoty,flag,taskNoty,suggNoty = getNotifications()
     myTeams = getProfileTeams(myProfile)
     if Project.objects.filter(id = pid).exists():
       project = Project.objects.get(id = pid)
       team = project.team
-      tasks = Task.objects.filter(project = project, forUser = myProfile, pending = True).order_by('-created_Date')
+      tasks = Task.objects.filter(project = project, pending = True).order_by('-created_Date')
       UpdateTasks(tasks)
       if myProfile == team.leader or myProfile in project.members.all():
         all_Projects = Project.objects.filter(team = team, is_Done = False).order_by('-started_Date')
@@ -1698,4 +1751,4 @@ def toViewPendingTasks(request, pid):
       'taskNoty': taskNoty,
       'suggNoty': suggNoty,
             })
-  return redirect('Home')
+    return redirect('Home')

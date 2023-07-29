@@ -26,6 +26,7 @@
               <p class="text-muted py-0 my-0">Project: {{task.project}}</p>
               <p class="text-muted py-0 my-0">To: {{task.forUser}}</p>
               <p class="text-muted py-0 my-0">Deadline: {{task.deadLine}} Days</p>
+              {% if task.dependsOn == None %}
               {% if task.is_Done %}
               <p class="text-muted py-0 my-0">Finished at: {{task.finishedDate}}</p>
               {% elif task.is_Done == False and task.is_Outdated %}
@@ -35,6 +36,7 @@
               {%endif%}
               {% if task.days_left == 0 and not task.is_Done %}
               <p class="text-warning py-0 my-0"><i class="mdi mdi-message-alert me-1"></i>This is your last day to finish the task!</p>
+              {%endif%}
               {%endif%}
             </div>
 
@@ -51,7 +53,7 @@
                       {% endif %}
                       <li><a type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#process{{task.id}}">Set Process</a></li>
                   </ul>
-                  
+
               </div>
             {%endif%}
             {%endif%}
@@ -64,11 +66,11 @@
         <p class="text-light p-3">{{task.description}}</p>
         {% if task.is_Done == False %}
         <div class="border-top py-2">
-          
+
           <div class="m-2 progress" style="height:15px;border-radius: 5px;">
             <div class="progress-bar" id="taskProgress{{task.id}}" style="width: {% if task.progress == '0.0%' or task.progress == '0%' %}5%{% else %}{{ task.progress }}{% endif %};">{{task.progress}}</div>
           </div>
-          
+
         </div>
         {% endif %}
       </div>
@@ -78,24 +80,26 @@
         {% if task.is_Done == False and task.progress == '100%' %}
           <a href="/applyTask/{{task.id}}" class="btn btn-success">Apply</a>
         {% elif task.is_Done %}
-        <i class="fas fa-check-circle fa-2x text-success"></i>    
-        {% else %}   
+        <i class="fas fa-check-circle fa-2x text-success"></i>
+        {% else %}
         <button type="button" class="btn btn-success" disabled>Apply</button>
         {% endif %}
         {% endif %}
         {% if team.leader == myProfile or project.projectLeader == myProfile %}
-          {% if "toViewTasks" in request.path %}
-            <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'1')">Remove</button>
-          {% endif %}
-          {% if "toViewMyTasks" in request.path %}
-            <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'2')">Remove</button>
-          {% endif %}
-          {% if "toViewDoneTasks" in request.path %}
-            <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'3')">Remove</button>
-          {% endif %}
-          {% if "toViewMyDoneTasks" in request.path %}
-            <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'4')">Remove</button>
-          {% endif %}
+            {% if task.is_Outdated == False %}
+              {% if "toViewTasks" in request.path %}
+                <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'1')">Remove</button>
+              {% endif %}
+              {% if "toViewMyTasks" in request.path %}
+                <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'2')">Remove</button>
+              {% endif %}
+              {% if "toViewDoneTasks" in request.path %}
+                <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'3')">Remove</button>
+              {% endif %}
+              {% if "toViewMyDoneTasks" in request.path %}
+                <button type="button" class="btn btn-danger" onclick="taskDelete({{task.id}},'4')">Remove</button>
+              {% endif %}
+            {% endif %}
         {% endif %}
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
@@ -108,20 +112,20 @@
 <div class="modal fade" id="extendDeadline{{task.id}}">
   <div class="modal-dialog">
     <div class="modal-content">
-  
+
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Deadline Extend/Reduce</h4>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
       </div>
-  
+
       <!-- Modal body -->
       <div class="modal-body">
         <form action="/taskDeadlineExtend/{{task.id}}" class="was-validated" method="post">
           {% csrf_token %}
-            <input class="form-control" type="number" name="deadLine" required>          
+            <input class="form-control" type="number" name="deadLine" required>
       </div>
-  
+
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary btn">Accept</button>
@@ -131,18 +135,18 @@
     </div>
   </div>
   </div>
-  
+
   <!-- Suggestion -->
   <div class="modal fade" id="suggest{{task.id}}">
   <div class="modal-dialog">
     <div class="modal-content">
-  
+
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Suggest</h4>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
       </div>
-  
+
       <!-- Modal body -->
       <div class="modal-body">
         <form action="/suggestion/{{task.id}}" class="was-validated mb-3  d-flex align-items-center justify-content-center" method="post" style="margin-right: 105px;">
@@ -154,9 +158,9 @@
                 <option>{{ member.owner.username }}</option>
                 {%endif%}
               {% endfor %}
-            </select>          
+            </select>
       </div>
-  
+
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary btn">Apply</button>
@@ -166,25 +170,25 @@
     </div>
   </div>
   </div>
-  
+
   <!-- Set process -->
   <div class="modal fade" id="process{{task.id}}">
   <div class="modal-dialog">
     <div class="modal-content">
-  
+
       <!-- Modal Header -->
       <div class="modal-header">
         <h4 class="modal-title">Set process value</h4>
         <button type="button" class="btn btn-close" data-bs-dismiss="modal"><i class="mdi mdi-close"></i></button>
       </div>
-  
+
       <!-- Modal body -->
       <div class="modal-body">
         <form action="/saveTaskChanges/{{task.id}}/{{project.id}}" class="was-validated" method="post">
           {% csrf_token %}
-            <input class="form-control" type="number" name="process" required>         
+            <input class="form-control" type="number" name="process" required>
       </div>
-  
+
       <!-- Modal footer -->
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary btn">Set</button>
@@ -197,7 +201,7 @@
 
 
 {% if task.dependsOn is not None and task.is_Outdated == False %}
-<div style="border-radius: 10px;text-decoration: none;background: #191C24;" class="w-100 p-3 my-2">
+<a id="CustomButton" style="border-radius: 10px;text-decoration: none;background: #191C24;" class="w-100 p-3 my-2" type="button" data-bs-toggle="modal" data-bs-target="#taskInfoModal{{task.id}}">
   <div class="row">
 
     <div class="d-flex col-md-4 col-xl-4">
@@ -208,26 +212,26 @@
         <i class="fas fa-check-circle text-warning me-2" ></i>
         <h6 class="text-success">{{ task.title }}<br><p class="text-muted mb-1 mt-1" style="font-size: 12px;">Task Number:{{task.id}}</p></h6>
         {% endif %}
-        
-     
-    
+
+
+
     </div>
 
     <div class="col-md-6 col-xl-6">
         <small class="text-muted">Posted: {{ task.created_Date }}</small>
         {% if task.is_Done %}
         <small class="text-muted"><span class="me-2">|</span> Finished At: {{ task.finishedDate }}</small>
-        {%endif%}  
+        {%endif%}
     </div>
     <div class="col-md-2 col-xl-2">
-        <small class="text-muted">To: {{ task.forUser.owner.username }}</small> 
+        <small class="text-muted">To: {{ task.forUser.owner.username }}</small>
     </div>
   </div>
 
   {% if task.is_Done == False %}
     <p class="text-warning m-0 p-0 pt-2 border-top">This task is locked, it depends on task with number: {{task.dependsOn.id}}</p>
-  {% endif %}     
-</div>
+  {% endif %}
+</a>
 {% else %}
 <a id="CustomButton" style="border-radius: 10px;text-decoration: none;background: #191C24;" class="w-100 p-3 my-2" type="button" data-bs-toggle="modal" data-bs-target="#taskInfoModal{{task.id}}">
   <div class="row">
@@ -239,16 +243,16 @@
         <i class="fas fa-check-circle text-success me-2" ></i>
         <h6 class="text-success">{{ task.title }}<br><p class="text-muted mb-1 mt-1" style="font-size: 12px;">Task Number:{{task.id}}</p></h6>
         {% endif %}
-        
+
     </div>
     <div class="col-md-6 col-xl-6">
         <small class="text-muted">Posted: {{ task.created_Date }}</small>
         {% if task.is_Done %}
         <small class="text-muted"><span class="me-2">|</span> Finished At: {{ task.finishedDate }}</small>
-        {%endif%}  
+        {%endif%}
     </div>
     <div class="col-md-2 col-xl-2">
-        <small class="text-muted">To: {{ task.forUser.owner.username }}</small> 
+        <small class="text-muted">To: {{ task.forUser.owner.username }}</small>
     </div>
   </div>
 
@@ -258,7 +262,7 @@
     <div class="progress-bar" id="taskProgress{{task.id}}" style="width: {% if task.progress == '0.0%' or task.progress == '0%' %}5%{% else %}{{ task.progress }}{% endif %};">{{task.progress}}</div>
   </div>
 </div>
-  {% endif %}     
+  {% endif %}
 </a>
   <script>
     function taskDelete(id,type) {

@@ -14,6 +14,7 @@
                 <div class="col-md-4 grid-margin stretch-card border p-3 m-0">
                     <div class="preview-item">
                             <h6 class="preview-subject">Task aprrove request from <y class="text-success">{{task.forUser.owner.username}}</y> <p class="text-muted">{{task.modified_Date}}</p></h6>
+                            <p class="text-muted m-0 p-0">Task title: {{task.title}}</p>
                             <p class="text-muted m-0 p-0">Task Number: {{task.id}}</p>
                             <p class="text-muted m-0 p-0">Team: {{task.project.team}}</p>
                             <p class="text-muted m-0 p-0">Project: {{task.project}}</p>
@@ -21,13 +22,13 @@
                                 <a href="/finishTask/{{task.id}}" class="me-3">
                                     <i class="mdi mdi-checkbox-marked-circle-outline" style="font-size: 25px;"></i>
                                 </a>
-                                <a href="/recoverTask/{{task.id}}"><i class="mdi mdi-close-circle-outline" style="font-size: 25px;"></i></a>                                    
+                                <a href="/recoverTask/{{task.id}}"><i class="mdi mdi-close-circle-outline" style="font-size: 25px;"></i></a>
                             </div>
                     </div>
                 </div>
 
             {% endfor %}
-               
+
     </div>
     {% else %}
 
@@ -35,8 +36,8 @@
 
 
     {%endif%}
-        
-    
+
+
 
 
 {% endblock %}
